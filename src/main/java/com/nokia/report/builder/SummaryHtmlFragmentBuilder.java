@@ -117,6 +117,16 @@ public class SummaryHtmlFragmentBuilder {
               .append(s.getOverallStatus())
               .append("</span></td>");
 
+            // Timing cells
+            String startTime = node.getActivityStartTime();
+            String endTime   = node.getActivityEndTime();
+            String duration  = HtmlFragmentBuilder.computeDuration(startTime, endTime);
+            String startDisp = (startTime != null && !startTime.trim().isEmpty()) ? startTime : "-";
+            String endDisp   = (endTime   != null && !endTime.trim().isEmpty())   ? endTime   : "-";
+            sb.append("<td class=\"col-time\">").append(HtmlFragmentBuilder.esc(startDisp)).append("</td>");
+            sb.append("<td class=\"col-time\">").append(HtmlFragmentBuilder.esc(endDisp)).append("</td>");
+            sb.append("<td class=\"col-time\">").append(duration).append("</td>");
+
             sb.append("</tr>");
         }
         return sb.toString();

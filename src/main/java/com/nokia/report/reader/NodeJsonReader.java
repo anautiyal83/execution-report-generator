@@ -1,6 +1,8 @@
 package com.nokia.report.reader;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nokia.report.model.CommandResultDetail;
+import com.nokia.report.model.ExecutionMetadata;
 import com.nokia.report.model.NodeExecutionData;
 import com.nokia.report.model.NodeExecutionJson;
 import org.slf4j.Logger;
@@ -66,6 +68,7 @@ public class NodeJsonReader {
                 continue;
             }
             NodeExecutionData data = new NodeExecutionData(nodeName, raw.getData());
+            applyTiming(data, raw);
             dataMap.put(nodeName, data);
             log.info("Loaded {} commands for node '{}' from {}", raw.getData().size(), nodeName, f.getName());
         }
@@ -104,8 +107,10 @@ public class NodeJsonReader {
         NodeExecutionJson raw = parseFile(f);
         String nodeName = resolveNodeName(raw, f);
         log.info("Loaded {} commands for node '{}' from {}", raw.getData().size(), nodeName, f.getName());
+        NodeExecutionData data = new NodeExecutionData(nodeName, raw.getData());
+        applyTiming(data, raw);
         List<NodeExecutionData> result = new ArrayList<>();
-        result.add(new NodeExecutionData(nodeName, raw.getData()));
+        result.add(data);
         return result;
     }
 
@@ -130,6 +135,30 @@ public class NodeJsonReader {
         // Metadata or nodeName missing — warn and fall back to filename stem
         log.warn("metadata.nodeName missing in '{}' — falling back to filename", f.getName());
         return stem(f.getName());
+    }
+
+    private static void applyTiming(NodeExecutionData data, NodeExecutionJson raw) {
+        // Primary: use metadata.execution_summary if present and populated
+        if (raw.getMetadata() != null && raw.getMetadata().getExecutionSummary() != null) {
+            ExecutionMetadata.ExecutionSummary summary = raw.getMetadata().getExecutionSummary();
+            if (summary.getStartDateAndTime() != null && !summary.getStartDateAndTime().isEmpty()) {
+                data.setActivityStartTime(summary.getStartDateAndTime());
+            }
+            if (summary.getEndDateAndTime() != null && !summary.getEndDateAndTime().isEmpty()) {
+                data.setActivityEndTime(summary.getEndDateAndTime());
+            }
+        }
+        // Fallback: derive from the first command's start and last command's end
+        if ((data.getActivityStartTime() == null || data.getActivityEndTime() == null)
+                && raw.getData() != null && !raw.getData().isEmpty()) {
+            List<CommandResultDetail> cmds = new ArrayList<>(raw.getData().values());
+            if (data.getActivityStartTime() == null) {
+                data.setActivityStartTime(cmds.get(0).getStartDateAndTime());
+            }
+            if (data.getActivityEndTime() == null) {
+                data.setActivityEndTime(cmds.get(cmds.size() - 1).getEndDateAndTime());
+            }
+        }
     }
 
     private static String stem(String filename) {

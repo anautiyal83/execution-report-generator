@@ -60,6 +60,12 @@ public class CommandResultDetail {
     @JsonProperty("output")
     private String output;
 
+    @JsonProperty("startDateAndTime")
+    private String startDateAndTime;
+
+    @JsonProperty("endDateAndTime")
+    private String endDateAndTime;
+
     public String getPhase()                  { return phase; }
     public String getTarget()                 { return target; }
     public String getCommand()                { return command; }
@@ -72,4 +78,6 @@ public class CommandResultDetail {
     public String getValidationStatus()       { return validationStatus; }
     public String getValidationConclusion()   { return validationConclusion; }
     public String getOutput()                 { return output; }
+    public String getStartDateAndTime()       { return startDateAndTime; }
+    public String getEndDateAndTime()         { return endDateAndTime; }
 }

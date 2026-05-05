@@ -83,6 +83,8 @@
     .table td.col-node { width: 60px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .table th.col-overall { border-left: 2px solid rgba(255,255,255,.25); width: 65px; }
     .table th.col-phase { font-size: 9px; padding: 5px 3px; width: 65px; overflow: hidden; word-break: break-word; }
+    .table th.col-time { border-left: 1px solid rgba(255,255,255,.15); width: 120px; font-size: 10px; }
+    .table td.col-time { border-left: 1px solid #e8ecf0; font-size: 10px; white-space: nowrap; }
     .table td {
       padding: 5px 10px; border-bottom: 1px solid #e8ecf0;
       border-right: 1px solid #e8ecf0;
@@ -179,6 +181,9 @@
             <th class="col-node">Node</th>
             {{SUMMARY_PHASE_HEADERS}}
             <th class="col-overall">Overall</th>
+            <th class="col-time">Start Time</th>
+            <th class="col-time">End Time</th>
+            <th class="col-time">Duration</th>
           </tr>
         </thead>
         <tbody>{{SUMMARY_TABLE_ROWS}}</tbody>

@@ -85,6 +85,9 @@ public class HtmlFragmentBuilder {
                 .replace("{{SR_VAL_FAIL}}",    String.valueOf(s.getValFail()))
                 .replace("{{SR_VAL_WARN}}",    String.valueOf(s.getValWarn()))
                 .replace("{{SR_INFO_ONLY}}",   String.valueOf(s.getInfoOnly()))
+                .replace("{{SR_START_TIME}}", esc(orNA(node.getActivityStartTime())))
+                .replace("{{SR_END_TIME}}",   esc(orNA(node.getActivityEndTime())))
+                .replace("{{SR_DURATION}}",   computeDuration(node.getActivityStartTime(), node.getActivityEndTime()))
             );
         }
         return sb.toString();
@@ -120,6 +123,9 @@ public class HtmlFragmentBuilder {
             .replace("{{NP_VAL_FAIL}}",     String.valueOf(s.getValFail()))
             .replace("{{NP_VAL_WARN}}",     String.valueOf(s.getValWarn()))
             .replace("{{NP_INFO_ONLY}}",    String.valueOf(s.getInfoOnly()))
+            .replace("{{NP_START_TIME}}",   esc(orNA(node.getActivityStartTime())))
+            .replace("{{NP_END_TIME}}",     esc(orNA(node.getActivityEndTime())))
+            .replace("{{NP_DURATION}}",     computeDuration(node.getActivityStartTime(), node.getActivityEndTime()))
             .replace("{{NP_COMMAND_ROWS}}", buildCommandTableRows(node));
     }
 
@@ -198,7 +204,10 @@ public class HtmlFragmentBuilder {
             .replace("{{CR_VAL_CRITERIA}}",   esc(valCriteria))
             .replace("{{CR_VAL_BADGE}}",      valBadge)
             .replace("{{CR_VAL_STATUS}}",     esc(valStatus))
-            .replace("{{CR_VAL_DETAIL}}",     valDetailHtml);
+            .replace("{{CR_VAL_DETAIL}}",     valDetailHtml)
+            .replace("{{CR_START_TIME}}",     esc(orNA(d.getStartDateAndTime())))
+            .replace("{{CR_END_TIME}}",       esc(orNA(d.getEndDateAndTime())))
+            .replace("{{CR_DURATION}}",       computeDuration(d.getStartDateAndTime(), d.getEndDateAndTime()));
     }
 
     // -------------------------------------------------------------------------
@@ -221,6 +230,21 @@ public class HtmlFragmentBuilder {
         if (r != null) return r;
         if (f != null) return f;
         return "#N/A";
+    }
+
+    public static String computeDuration(String start, String end) {
+        if (start == null || end == null || start.isEmpty() || end.isEmpty()) return "-";
+        try {
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            long diff = sdf.parse(end).getTime() - sdf.parse(start).getTime();
+            long seconds = diff / 1000;
+            if (seconds < 0) return "-";
+            long mins = seconds / 60;
+            long secs = seconds % 60;
+            return mins > 0 ? mins + "m " + secs + "s" : secs + "s";
+        } catch (Exception e) {
+            return "-";
+        }
     }
 
     public static String nodeId(String nodeName) {
