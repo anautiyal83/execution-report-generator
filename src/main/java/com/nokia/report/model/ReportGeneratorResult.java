@@ -31,9 +31,20 @@ public class ReportGeneratorResult {
         this.parameters = parameters;
     }
 
-    public static ReportGeneratorResult success(String reportFilename) {
+    /**
+     * Success result with both summary and detail report filenames.
+     *
+     * @param summaryFilename filename of the summary report (always generated)
+     * @param detailFilename  filename of the detail report, or {@code null} if no failures
+     */
+    public static ReportGeneratorResult success(String summaryFilename, String detailFilename) {
         LinkedHashMap<String, String> params = new LinkedHashMap<>();
-        params.put("REPORT_FILENAME", reportFilename);
+        if (summaryFilename != null) {
+            params.put("SUMMARY_REPORT_FILENAME", summaryFilename);
+        }
+        if (detailFilename != null) {
+            params.put("DETAIL_REPORT_FILENAME", detailFilename);
+        }
         return new ReportGeneratorResult("SUCCESS", 0, params);
     }
 

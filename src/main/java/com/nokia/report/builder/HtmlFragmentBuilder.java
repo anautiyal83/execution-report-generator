@@ -3,6 +3,7 @@ package com.nokia.report.builder;
 import com.nokia.report.model.CommandResultDetail;
 import com.nokia.report.model.ExecutionStats;
 import com.nokia.report.model.NodeExecutionData;
+import com.nokia.report.template.TemplateEngine;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,36 +12,55 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Builds HTML fragment strings for the dynamic sections of the MOP execution report.
+ * Builds HTML fragment strings for the detail report.
  *
- * Static HTML structure (cards, panel shell, table headers, metadata items) lives in
- * the HTML template file. This class only handles data that requires Java loops:
- *   - Per-node summary table rows  ({{NODES_SUMMARY_ROWS}})
- *   - Per-node detail panels       ({{NODE_DETAIL_SECTIONS}}) — filled via sub-template
- *   - Per-command table rows       (inner loop inside each panel)
+ * Raw command outputs and validation conclusions are NOT embedded in the HTML DOM.
+ * Instead they are stored in JS objects (RAW_OUTPUTS, VAL_CONCLUSIONS) injected once
+ * at the bottom of the page and loaded into the DOM lazily on user interaction.
+ * This keeps the HTML file small regardless of output volume.
  */
 public class HtmlFragmentBuilder {
 
     private static final List<String> PHASE_ORDER = Arrays.asList(
-        "PRE_NODE_HEALTH_CHECK",
-        "BACKUP",
-        "ACTIVITY_PRECHECK",
-        "ACTIVITY_CONFIGURATION",
-        "ACTIVITY_POSTCHECK",
-        "POST_NODE_HEALTH_CHECK",
-        "ROLLBACK_PRECHECK",
-        "ROLLBACK_CONFIGURATION",
-        "ROLLBACK_POSTCHECK"
+        "PRE_NODE_HEALTH_CHECK", "BACKUP", "ACTIVITY_PRECHECK",
+        "ACTIVITY_CONFIGURATION", "ACTIVITY_POSTCHECK",
+        "ROLLBACK_PRECHECK", "ROLLBACK_CONFIGURATION", "ROLLBACK_POSTCHECK",
+        "POST_NODE_HEALTH_CHECK"
     );
 
     private final String nodePanelTemplate;
+    private final String summaryRowTemplate;
+    private final String phaseHeaderTemplate;
+    private final String commandRowTemplate;
+    private final String valDetailStaticTemplate;
+    private final String valDetailExpandableTemplate;
 
-    /**
-     * @param nodePanelTemplate the "tpl-node-panel" sub-template extracted from the HTML template.
-     *                          Contains {{NP_*}} placeholders that are filled per node.
-     */
-    public HtmlFragmentBuilder(String nodePanelTemplate) {
-        this.nodePanelTemplate = nodePanelTemplate;
+    // JS data stores — populated during buildAllNodeSections()
+    private final Map<String, String> rawOutputStore     = new LinkedHashMap<>();
+    private final Map<String, String> valConclusionStore = new LinkedHashMap<>();
+    private int rowCounter = 0;
+
+    public HtmlFragmentBuilder(TemplateEngine engine) {
+        this.nodePanelTemplate          = engine.getSubTemplate("tpl-node-panel");
+        this.summaryRowTemplate         = engine.getSubTemplate("tpl-summary-row");
+        this.phaseHeaderTemplate        = engine.getSubTemplate("tpl-phase-header");
+        this.commandRowTemplate         = engine.getSubTemplate("tpl-command-row");
+        this.valDetailStaticTemplate    = engine.getSubTemplate("tpl-val-detail-static");
+        this.valDetailExpandableTemplate = engine.getSubTemplate("tpl-val-detail-expandable");
+    }
+
+    // -------------------------------------------------------------------------
+    // JS data stores
+    // -------------------------------------------------------------------------
+
+    /** Serialise the raw-output store as a JS object literal for {{RAW_OUTPUTS_JS}}. */
+    public String getRawOutputsJs() {
+        return toJsObject(rawOutputStore);
+    }
+
+    /** Serialise the val-conclusion store as a JS object literal for {{VAL_CONCLUSIONS_JS}}. */
+    public String getValConclusionsJs() {
+        return toJsObject(valConclusionStore);
     }
 
     // -------------------------------------------------------------------------
@@ -51,27 +71,27 @@ public class HtmlFragmentBuilder {
         StringBuilder sb = new StringBuilder();
         for (NodeExecutionData node : nodes) {
             ExecutionStats s = ExecutionStats.from(node);
-            String nid      = nodeId(node.getNodeName());
-            String badgeCls = s.isSuccess() ? "badge-success" : "badge-error";
-            sb.append("  <tr class=\"summary-row\" onclick=\"scrollToNode('").append(nid)
-              .append("')\" title=\"Click to jump to ").append(esc(node.getNodeName())).append(" details\">\n")
-              .append("    <td><strong>").append(esc(node.getNodeName())).append("</strong></td>\n")
-              .append("    <td><span class=\"badge ").append(badgeCls).append("\">").append(s.getOverallStatus()).append("</span></td>\n")
-              .append("    <td>").append(s.getTotal()).append("</td>\n")
-              .append("    <td class=\"cell-success\">").append(s.getSuccess()).append("</td>\n")
-              .append("    <td class=\"cell-failed\">").append(s.getFailed()).append("</td>\n")
-              .append("    <td>").append(s.getValEnabled()).append("</td>\n")
-              .append("    <td class=\"cell-success\">").append(s.getValPass()).append("</td>\n")
-              .append("    <td class=\"cell-failed\">").append(s.getValFail()).append("</td>\n")
-              .append("    <td class=\"cell-warning\">").append(s.getValWarn()).append("</td>\n")
-              .append("    <td>").append(s.getInfoOnly()).append("</td>\n")
-              .append("  </tr>\n");
+            String nid = nodeId(node.getNodeName());
+            sb.append(summaryRowTemplate
+                .replace("{{SR_NID}}",        nid)
+                .replace("{{SR_NAME}}",        esc(node.getNodeName()))
+                .replace("{{SR_BADGE_CLS}}",   s.isSuccess() ? "badge-success" : "badge-error")
+                .replace("{{SR_STATUS}}",      s.getOverallStatus())
+                .replace("{{SR_TOTAL}}",       String.valueOf(s.getTotal()))
+                .replace("{{SR_SUCCESS}}",     String.valueOf(s.getSuccess()))
+                .replace("{{SR_FAILED}}",      String.valueOf(s.getFailed()))
+                .replace("{{SR_VAL_ENABLED}}", String.valueOf(s.getValEnabled()))
+                .replace("{{SR_VAL_PASS}}",    String.valueOf(s.getValPass()))
+                .replace("{{SR_VAL_FAIL}}",    String.valueOf(s.getValFail()))
+                .replace("{{SR_VAL_WARN}}",    String.valueOf(s.getValWarn()))
+                .replace("{{SR_INFO_ONLY}}",   String.valueOf(s.getInfoOnly()))
+            );
         }
         return sb.toString();
     }
 
     // -------------------------------------------------------------------------
-    // Node detail panels (filled from sub-template)
+    // Node detail panels
     // -------------------------------------------------------------------------
 
     public String buildAllNodeSections(List<NodeExecutionData> nodes) {
@@ -84,32 +104,30 @@ public class HtmlFragmentBuilder {
 
     private String buildNodePanel(NodeExecutionData node, int index) {
         ExecutionStats s = ExecutionStats.from(node);
-        String nid       = nodeId(node.getNodeName());
-
+        String nid = nodeId(node.getNodeName());
         return nodePanelTemplate
-            .replace("{{NP_PANEL_CLS}}",      s.isSuccess() ? "" : " panel-failed")
-            .replace("{{NP_ID}}",             nid)
-            .replace("{{NP_INDEX}}",          String.valueOf(index))
-            .replace("{{NP_NAME}}",           esc(node.getNodeName()))
-            .replace("{{NP_BADGE_CLS}}",      s.isSuccess() ? "badge-success" : "badge-error")
-            .replace("{{NP_STATUS}}",         s.getOverallStatus())
-            .replace("{{NP_TOTAL}}",          String.valueOf(s.getTotal()))
-            .replace("{{NP_SUCCESS}}",        String.valueOf(s.getSuccess()))
-            .replace("{{NP_FAILED}}",         String.valueOf(s.getFailed()))
-            .replace("{{NP_VAL_TOTAL}}",      String.valueOf(s.getValEnabled()))
-            .replace("{{NP_VAL_PASS}}",       String.valueOf(s.getValPass()))
-            .replace("{{NP_VAL_FAIL}}",       String.valueOf(s.getValFail()))
-            .replace("{{NP_VAL_WARN}}",       String.valueOf(s.getValWarn()))
-            .replace("{{NP_INFO_ONLY}}",      String.valueOf(s.getInfoOnly()))
-            .replace("{{NP_COMMAND_ROWS}}",   buildCommandTableRows(node));
+            .replace("{{NP_PANEL_CLS}}",    s.isSuccess() ? "" : " panel-failed")
+            .replace("{{NP_ID}}",           nid)
+            .replace("{{NP_INDEX}}",        String.valueOf(index))
+            .replace("{{NP_NAME}}",         esc(node.getNodeName()))
+            .replace("{{NP_BADGE_CLS}}",    s.isSuccess() ? "badge-success" : "badge-error")
+            .replace("{{NP_STATUS}}",       s.getOverallStatus())
+            .replace("{{NP_TOTAL}}",        String.valueOf(s.getTotal()))
+            .replace("{{NP_SUCCESS}}",      String.valueOf(s.getSuccess()))
+            .replace("{{NP_FAILED}}",       String.valueOf(s.getFailed()))
+            .replace("{{NP_VAL_TOTAL}}",    String.valueOf(s.getValEnabled()))
+            .replace("{{NP_VAL_PASS}}",     String.valueOf(s.getValPass()))
+            .replace("{{NP_VAL_FAIL}}",     String.valueOf(s.getValFail()))
+            .replace("{{NP_VAL_WARN}}",     String.valueOf(s.getValWarn()))
+            .replace("{{NP_INFO_ONLY}}",    String.valueOf(s.getInfoOnly()))
+            .replace("{{NP_COMMAND_ROWS}}", buildCommandTableRows(node));
     }
 
     // -------------------------------------------------------------------------
-    // Command table rows (dynamic: one row per command result)
+    // Command table rows
     // -------------------------------------------------------------------------
 
     private String buildCommandTableRows(NodeExecutionData node) {
-        // Group commands by phase, preserving insertion order within each phase
         Map<String, List<Map.Entry<String, CommandResultDetail>>> byPhase = new LinkedHashMap<>();
         for (Map.Entry<String, CommandResultDetail> entry : node.getCommands().entrySet()) {
             String ph = entry.getValue().getPhase();
@@ -118,94 +136,84 @@ public class HtmlFragmentBuilder {
             byPhase.get(ph).add(entry);
         }
 
-        // Sort phases by defined sequence; unrecognised phases go at the end
         List<String> sortedPhases = new ArrayList<>();
-        for (String p : PHASE_ORDER) {
-            if (byPhase.containsKey(p)) sortedPhases.add(p);
-        }
-        for (String p : byPhase.keySet()) {
-            if (!sortedPhases.contains(p)) sortedPhases.add(p);
-        }
+        for (String p : PHASE_ORDER) { if (byPhase.containsKey(p)) sortedPhases.add(p); }
+        for (String p : byPhase.keySet()) { if (!sortedPhases.contains(p)) sortedPhases.add(p); }
 
         StringBuilder sb = new StringBuilder();
         for (String phase : sortedPhases) {
-            List<Map.Entry<String, CommandResultDetail>> cmds = byPhase.get(phase);
-
-            // Phase header row spanning all 10 data columns — collapsible
-            sb.append("        <tr class=\"phase-header-row\" onclick=\"togglePhase(this)\">\n")
-              .append("          <td colspan=\"10\"><span class=\"phase-toggle-icon\">&#9660;</span> ").append(esc(phase)).append("</td>\n")
-              .append("        </tr>\n");
-
-            for (int i = 0; i < cmds.size(); i++) {
-                Map.Entry<String, CommandResultDetail> entry = cmds.get(i);
-                String cmd = entry.getKey();
-                CommandResultDetail d = entry.getValue();
-
-                boolean success    = d.isSuccess();
-                String target      = orNA(d.getTarget());
-                String description = orNA(d.getDescription());
-                String failReason  = success ? "#N/A" : buildFailReason(d.getReason(), d.getFailure());
-                boolean validate   = d.isValidate();
-                String valCriteria = orNA(d.getValidationCriteria());
-                String valStatus   = d.getValidationStatus() != null ? d.getValidationStatus().trim() : "SKIPPED";
-                String valDetail   = orNA(d.getValidationConclusion());
-                String rawOutput   = d.getOutput() != null ? d.getOutput() : "";
-
-                String execBadge     = success ? "badge-success" : "badge-error";
-                String execLabel     = success ? "Success" : "Failed";
-                String valLower      = valStatus.toLowerCase();
-                String valBadge      = valLower.equals("success") || valLower.equals("skipped")
-                                         ? "badge-success"
-                                         : valLower.equals("warning") ? "badge-warning" : "badge-error";
-                String validateBadge = validate ? "badge-enabled" : "badge-disabled";
-
-                String valDetailHtml;
-                if (valLower.equals("success") || valLower.equals("skipped")) {
-                    valDetailHtml = "<span class=\"na-text\">" + esc(valDetail) + "</span>";
-                } else {
-                    valDetailHtml = "<button class=\"output-toggle\" onclick=\"toggleOutput(this)\">View Details</button>"
-                                  + "<div class=\"output-content\"><pre>" + esc(valDetail) + "</pre></div>";
-                }
-
-                sb.append("        <tr class=\"row-data\" data-phase=\"").append(esc(phase)).append("\">\n")
-                  .append("          <td>").append(esc(target)).append("</td>\n")
-                  .append("          <td><code class=\"command-code\">").append(esc(cmd)).append("</code></td>\n")
-                  .append("          <td>").append(esc(description)).append("</td>\n")
-                  .append("          <td><span class=\"badge ").append(execBadge).append("\">")
-                  .append("<span class=\"status-icon\"></span>").append(execLabel).append("</span></td>\n")
-                  .append("          <td><span class=\"na-text\">").append(esc(failReason)).append("</span></td>\n")
-                  .append("          <td><span class=\"badge ").append(validateBadge).append("\">")
-                  .append(validate ? "True" : "False").append("</span></td>\n")
-                  .append("          <td>").append(esc(valCriteria)).append("</td>\n")
-                  .append("          <td><span class=\"badge ").append(valBadge).append("\">")
-                  .append("<span class=\"status-icon\"></span>").append(esc(valStatus)).append("</span></td>\n")
-                  .append("          <td>").append(valDetailHtml).append("</td>\n")
-                  .append("          <td><button class=\"output-toggle\" onclick=\"toggleOutput(this)\">View Output</button>")
-                  .append("<div class=\"output-content\"><pre>").append(esc(rawOutput)).append("</pre></div></td>\n")
-                  .append("        </tr>\n");
+            sb.append(phaseHeaderTemplate.replace("{{PH_PHASE}}", esc(phase)));
+            for (Map.Entry<String, CommandResultDetail> entry : byPhase.get(phase)) {
+                sb.append(buildCommandRow(phase, entry.getKey(), entry.getValue()));
             }
         }
         return sb.toString();
+    }
+
+    private String buildCommandRow(String phase, String cmd, CommandResultDetail d) {
+        String key      = "r" + rowCounter++;
+        boolean success = d.isSuccess();
+        String target   = d.getTarget() != null ? d.getTarget().trim() : "";
+        String desc     = orNA(d.getDescription());
+        String failReason = success ? "#N/A" : buildFailReason(d.getReason(), d.getFailure());
+
+        boolean validate  = d.isValidate();
+        String valStatus  = d.getValidationStatus() != null ? d.getValidationStatus().trim() : "SKIPPED";
+        String valLower   = valStatus.toLowerCase();
+        String valBadge   = valLower.equals("success") || valLower.equals("skipped") ? "badge-success"
+                          : valLower.equals("warning") ? "badge-warning" : "badge-error";
+        String valCriteria = orNA(d.getValidationCriteria());
+        String valConclusion = d.getValidationConclusion() != null ? d.getValidationConclusion() : "";
+
+        // Store raw output in JS store (not in DOM)
+        String rawOutput = d.getOutput() != null ? d.getOutput() : "";
+        rawOutputStore.put(key, rawOutput);
+
+        // Val conclusion: static text for success/skipped, lazy-load button for fail/warning
+        String valDetailHtml;
+        boolean needsExpand = !valLower.equals("success") && !valLower.equals("skipped")
+                              && !valConclusion.isEmpty();
+        if (needsExpand) {
+            valConclusionStore.put(key, valConclusion);
+            valDetailHtml = valDetailExpandableTemplate
+                .replace("{{VD_TEXT}}", "")      // not used — loaded lazily
+                .replace("{{CR_KEY}}", key);
+        } else {
+            valDetailHtml = valDetailStaticTemplate
+                .replace("{{VD_TEXT}}", esc(orNA(valConclusion)));
+        }
+
+        return commandRowTemplate
+            .replace("{{CR_PHASE}}",          esc(phase))
+            .replace("{{CR_IS_FAILED}}",      success ? "0" : "1")
+            .replace("{{CR_KEY}}",            key)
+            .replace("{{CR_CMD}}",            esc(cmd))
+            .replace("{{CR_DESC}}",           esc(desc))
+            .replace("{{CR_TARGET}}",         esc(target))
+            .replace("{{CR_EXEC_BADGE}}",     success ? "badge-success" : "badge-error")
+            .replace("{{CR_EXEC_LABEL}}",     success ? "Success" : "Failed")
+            .replace("{{CR_FAIL_REASON}}",    esc(failReason))
+            .replace("{{CR_VALIDATE_BADGE}}", validate ? "badge-enabled" : "badge-disabled")
+            .replace("{{CR_VALIDATE_LABEL}}", validate ? "True" : "False")
+            .replace("{{CR_VAL_CRITERIA}}",   esc(valCriteria))
+            .replace("{{CR_VAL_BADGE}}",      valBadge)
+            .replace("{{CR_VAL_STATUS}}",     esc(valStatus))
+            .replace("{{CR_VAL_DETAIL}}",     valDetailHtml);
     }
 
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
 
-    /** Escape HTML special characters to prevent XSS in report output. */
     public static String esc(String s) {
         if (s == null) return "";
-        return s.replace("&", "&amp;")
-                .replace("<", "&lt;")
-                .replace(">", "&gt;")
-                .replace("\"", "&quot;");
+        return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;");
     }
 
     private static String orNA(String s) {
         return (s == null || s.trim().isEmpty()) ? "#N/A" : s;
     }
 
-    /** Combine reason and failure fields into a single display string. */
     private static String buildFailReason(String reason, String failure) {
         String r = (reason  != null && !reason.trim().isEmpty())  ? reason.trim()  : null;
         String f = (failure != null && !failure.trim().isEmpty()) ? failure.trim() : null;
@@ -215,8 +223,41 @@ public class HtmlFragmentBuilder {
         return "#N/A";
     }
 
-    /** Derive a safe HTML element id from a node name. */
     public static String nodeId(String nodeName) {
         return nodeName.replaceAll("[^a-zA-Z0-9_-]", "_");
+    }
+
+    /** Serialise a String→String map to a JS object literal using JSON encoding. */
+    private static String toJsObject(Map<String, String> map) {
+        StringBuilder sb = new StringBuilder("{");
+        boolean first = true;
+        for (Map.Entry<String, String> e : map.entrySet()) {
+            if (!first) sb.append(',');
+            first = false;
+            sb.append(jsonString(e.getKey())).append(':').append(jsonString(e.getValue()));
+        }
+        sb.append('}');
+        return sb.toString();
+    }
+
+    /** Minimal JSON string encoding (handles the characters that matter in output text). */
+    private static String jsonString(String s) {
+        if (s == null) return "\"\"";
+        StringBuilder sb = new StringBuilder("\"");
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            switch (c) {
+                case '"':  sb.append("\\\""); break;
+                case '\\': sb.append("\\\\"); break;
+                case '\n': sb.append("\\n");  break;
+                case '\r': sb.append("\\r");  break;
+                case '\t': sb.append("\\t");  break;
+                default:
+                    if (c < 0x20) { sb.append(String.format("\\u%04x", (int) c)); }
+                    else           { sb.append(c); }
+            }
+        }
+        sb.append('"');
+        return sb.toString();
     }
 }

@@ -90,6 +90,25 @@ public class NodeJsonReader {
         return new ArrayList<>(dataMap.values());
     }
 
+    /**
+     * Load a single execution JSON file (single-node mode).
+     *
+     * @param jsonFilePath absolute path to the JSON file
+     * @return list containing exactly one NodeExecutionData
+     */
+    public List<NodeExecutionData> readSingle(String jsonFilePath) throws IOException {
+        File f = new File(jsonFilePath);
+        if (!f.exists() || !f.isFile()) {
+            throw new IOException("json-file not found: " + jsonFilePath);
+        }
+        NodeExecutionJson raw = parseFile(f);
+        String nodeName = resolveNodeName(raw, f);
+        log.info("Loaded {} commands for node '{}' from {}", raw.getData().size(), nodeName, f.getName());
+        List<NodeExecutionData> result = new ArrayList<>();
+        result.add(new NodeExecutionData(nodeName, raw.getData()));
+        return result;
+    }
+
     private NodeExecutionJson parseFile(File f) throws IOException {
         try {
             NodeExecutionJson raw = mapper.readValue(f, NodeExecutionJson.class);

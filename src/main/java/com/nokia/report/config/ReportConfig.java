@@ -44,48 +44,65 @@ public class ReportConfig {
     private String nodeType;
     private String activity;
     private String crGroup;
-    private String jsonDir;
+    private String jsonDir;             // directory of per-node JSON files (CR / multi-node mode)
+    private String jsonFile;            // single JSON file path (single-node mode); mutually exclusive with jsonDir
     private String outputHtmlPath;
     private String outputHtmlName;
-    private String templatePath;      // null = load from classpath (built-in default)
-    private List<String> nodeNames;   // null = include all JSON files found in jsonDir
+    private String templatePath;        // null = load from classpath (built-in default)
+    private String summaryTemplatePath; // null = load from classpath (built-in default)
+    private List<String> nodeNames;     // null = include all JSON files found in jsonDir
     private String requestId;
     private String timestamp;
+    private String summaryHtmlName;     // filename for summary report
+    private boolean generateSummary = true; // false = skip writing summary HTML
 
     // -------------------------------------------------------------------------
     // Getters
     // -------------------------------------------------------------------------
 
-    public String getNodeType()        { return nodeType; }
-    public String getActivity()        { return activity; }
-    public String getCrGroup()         { return crGroup; }
-    public String getJsonDir()         { return jsonDir; }
-    public String getOutputHtmlPath()  { return outputHtmlPath; }
-    public String getOutputHtmlName()  { return outputHtmlName; }
-    public String getTemplatePath()    { return templatePath; }
-    public List<String> getNodeNames() { return nodeNames; }
-    public String getRequestId()       { return requestId; }
-    public String getTimestamp()       { return timestamp; }
+    public String getNodeType()            { return nodeType; }
+    public String getActivity()            { return activity; }
+    public String getCrGroup()             { return crGroup; }
+    public String getJsonDir()             { return jsonDir; }
+    public String getJsonFile()            { return jsonFile; }
+    public String getOutputHtmlPath()      { return outputHtmlPath; }
+    public String getOutputHtmlName()      { return outputHtmlName; }
+    public String getTemplatePath()        { return templatePath; }
+    public String getSummaryTemplatePath() { return summaryTemplatePath; }
+    public List<String> getNodeNames()     { return nodeNames; }
+    public String getRequestId()           { return requestId; }
+    public String getTimestamp()           { return timestamp; }
+    public String getSummaryHtmlName()     { return summaryHtmlName; }
+    public boolean isGenerateSummary()     { return generateSummary; }
 
-    /** Convenience: full output file path = outputHtmlPath + separator + outputHtmlName */
+    /** Convenience: full detail report path = outputHtmlPath + separator + outputHtmlName */
     public String getOutputHtml() {
         return outputHtmlPath + File.separator + outputHtmlName;
+    }
+
+    /** Convenience: full summary report path = outputHtmlPath + separator + summaryHtmlName */
+    public String getSummaryHtml() {
+        return outputHtmlPath + File.separator + summaryHtmlName;
     }
 
     // -------------------------------------------------------------------------
     // Setters (for direct use or CLI parsing)
     // -------------------------------------------------------------------------
 
-    public void setNodeType(String nodeType)               { this.nodeType = nodeType; }
-    public void setActivity(String activity)               { this.activity = activity; }
-    public void setCrGroup(String crGroup)                 { this.crGroup = crGroup; }
-    public void setJsonDir(String jsonDir)                 { this.jsonDir = jsonDir; }
-    public void setOutputHtmlPath(String outputHtmlPath)   { this.outputHtmlPath = outputHtmlPath; }
-    public void setOutputHtmlName(String outputHtmlName)   { this.outputHtmlName = outputHtmlName; }
-    public void setTemplatePath(String templatePath)       { this.templatePath = templatePath; }
-    public void setNodeNames(List<String> nodeNames)       { this.nodeNames = nodeNames; }
-    public void setRequestId(String requestId)             { this.requestId = requestId; }
-    public void setTimestamp(String timestamp)             { this.timestamp = timestamp; }
+    public void setNodeType(String nodeType)                       { this.nodeType = nodeType; }
+    public void setActivity(String activity)                       { this.activity = activity; }
+    public void setCrGroup(String crGroup)                         { this.crGroup = crGroup; }
+    public void setJsonDir(String jsonDir)                         { this.jsonDir = jsonDir; }
+    public void setJsonFile(String jsonFile)                       { this.jsonFile = jsonFile; }
+    public void setOutputHtmlPath(String outputHtmlPath)           { this.outputHtmlPath = outputHtmlPath; }
+    public void setOutputHtmlName(String outputHtmlName)           { this.outputHtmlName = outputHtmlName; }
+    public void setTemplatePath(String templatePath)               { this.templatePath = templatePath; }
+    public void setSummaryTemplatePath(String summaryTemplatePath) { this.summaryTemplatePath = summaryTemplatePath; }
+    public void setNodeNames(List<String> nodeNames)               { this.nodeNames = nodeNames; }
+    public void setRequestId(String requestId)                     { this.requestId = requestId; }
+    public void setTimestamp(String timestamp)                     { this.timestamp = timestamp; }
+    public void setSummaryHtmlName(String summaryHtmlName)         { this.summaryHtmlName = summaryHtmlName; }
+    public void setGenerateSummary(boolean generateSummary)        { this.generateSummary = generateSummary; }
 
     // -------------------------------------------------------------------------
     // Validation
@@ -100,9 +117,28 @@ public class ReportConfig {
         requireField(nodeType,       "--node-type");
         requireField(activity,       "--activity");
         requireField(crGroup,        "--cr-group");
-        requireField(jsonDir,        "--json-dir");
         requireField(outputHtmlPath, "--output-html-path");
         requireField(outputHtmlName, "--output-html-name");
+
+        // If --json-dir points to a file, silently promote it to --json-file
+        if ((jsonFile == null || jsonFile.trim().isEmpty())
+                && jsonDir != null && !jsonDir.trim().isEmpty()
+                && new File(jsonDir.trim()).isFile()) {
+            jsonFile = jsonDir;
+            jsonDir  = null;
+        }
+
+        // Require exactly one of --json-file or --json-dir
+        boolean hasFile = jsonFile != null && !jsonFile.trim().isEmpty();
+        boolean hasDir  = jsonDir  != null && !jsonDir.trim().isEmpty();
+        if (!hasFile && !hasDir) {
+            throw new ReportGeneratorException("Required field missing: --json-file or --json-dir");
+        }
+
+        // Summary report name is only required when summary generation is enabled
+        if (generateSummary) {
+            requireField(summaryHtmlName, "--output-summary-name");
+        }
 
         // Apply defaults for optional fields
         if (requestId == null || requestId.trim().isEmpty()) requestId = "N/A";
@@ -119,15 +155,30 @@ public class ReportConfig {
     }
 
     private void validatePaths() throws ReportGeneratorException {
-        // --json-dir must exist and be a directory
-        File jsonDirFile = new File(jsonDir);
-        if (!jsonDirFile.exists()) {
-            throw new ReportGeneratorException(
-                "Invalid path: --json-dir '" + jsonDir + "' does not exist");
-        }
-        if (!jsonDirFile.isDirectory()) {
-            throw new ReportGeneratorException(
-                "Invalid path: --json-dir '" + jsonDir + "' is not a directory");
+        boolean hasFile = jsonFile != null && !jsonFile.trim().isEmpty();
+
+        if (hasFile) {
+            // --json-file must exist and be a regular file
+            File f = new File(jsonFile.trim());
+            if (!f.exists()) {
+                throw new ReportGeneratorException(
+                    "Invalid path: --json-file '" + jsonFile + "' does not exist");
+            }
+            if (!f.isFile()) {
+                throw new ReportGeneratorException(
+                    "Invalid path: --json-file '" + jsonFile + "' is not a file");
+            }
+        } else {
+            // --json-dir must exist and be a directory
+            File jsonDirFile = new File(jsonDir);
+            if (!jsonDirFile.exists()) {
+                throw new ReportGeneratorException(
+                    "Invalid path: --json-dir '" + jsonDir + "' does not exist");
+            }
+            if (!jsonDirFile.isDirectory()) {
+                throw new ReportGeneratorException(
+                    "Invalid path: --json-dir '" + jsonDir + "' is not a directory");
+            }
         }
 
         // --output-html-path must exist as a directory or be creatable
@@ -184,9 +235,18 @@ public class ReportConfig {
             return this;
         }
 
-        /** Directory containing per-node execution JSON files. Required. */
+        /** Directory containing per-node execution JSON files. Required unless {@code jsonFile} is set. */
         public Builder jsonDir(String jsonDir) {
             config.jsonDir = jsonDir;
+            return this;
+        }
+
+        /**
+         * Single JSON file path for single-node mode. Required unless {@code jsonDir} is set.
+         * Mutually exclusive with {@code jsonDir}.
+         */
+        public Builder jsonFile(String jsonFile) {
+            config.jsonFile = jsonFile;
             return this;
         }
 
@@ -203,11 +263,35 @@ public class ReportConfig {
         }
 
         /**
-         * Path to a custom HTML template file. Optional.
+         * Path to a custom detail HTML template file. Optional.
          * If not set, the built-in classpath template is used.
          */
         public Builder templatePath(String templatePath) {
             config.templatePath = templatePath;
+            return this;
+        }
+
+        /**
+         * Path to a custom summary HTML template file. Optional.
+         * If not set, the built-in classpath summary template is used.
+         */
+        public Builder summaryTemplatePath(String summaryTemplatePath) {
+            config.summaryTemplatePath = summaryTemplatePath;
+            return this;
+        }
+
+        /** Filename for the generated summary HTML report, e.g. {@code "summary.html"}. Required when generateSummary is true. */
+        public Builder summaryHtmlName(String summaryHtmlName) {
+            config.summaryHtmlName = summaryHtmlName;
+            return this;
+        }
+
+        /**
+         * Whether to generate the summary HTML report. Defaults to {@code true}.
+         * Set to {@code false} to skip writing the summary report (e.g. single-node mode).
+         */
+        public Builder generateSummary(boolean generateSummary) {
+            config.generateSummary = generateSummary;
             return this;
         }
 

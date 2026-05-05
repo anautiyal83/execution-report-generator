@@ -1,6 +1,6 @@
 # Execution Report Generator — Technical Documentation
 
-**Version:** 1.0.0
+**Version:** 1.1.0
 **Group ID:** `com.nokia`
 **Artifact ID:** `execution-report-generator`
 **Java:** 8+
@@ -49,31 +49,35 @@
           ▼                  ▼                  ▼
   ┌───────────────┐  ┌──────────────┐  ┌──────────────┐
   │ NodeJsonReader│  │TemplateEngine│  │  ReportWriter │
-  │               │  │              │  │               │
-  │ Reads *.json  │  │ Loads HTML   │  │ Writes final  │
-  │ from jsonDir  │  │ template;    │  │ HTML to disk  │
-  │               │  │ extracts     │  └──────────────┘
-  └───────┬───────┘  │ sub-templates│
-          │          └──────┬───────┘
+  │               │  │  (×2)        │  │               │
+  │ read() or     │  │ Summary +    │  │ Writes final  │
+  │ readSingle()  │  │ Detail       │  │ HTML to disk  │
+  │               │  │ templates    │  └──────────────┘
+  └───────┬───────┘  └──────┬───────┘
+          │                 │
           ▼                 ▼
-  List<NodeExecutionData>  nodePanelTemplate (String)
+  List<NodeExecutionData>  sub-templates (String)
           │                 │
           └────────┬────────┘
                    ▼
-         ┌──────────────────────┐
-         │  HtmlFragmentBuilder │
-         │                      │
-         │  buildNodesSummaryRows()
-         │  buildAllNodeSections()
-         └──────────────────────┘
+    ┌──────────────────────────────────┐
+    │  SummaryHtmlFragmentBuilder      │  → summary report (multi-node, optional)
+    │  buildSummaryPhaseHeaders()      │
+    │  buildSummaryTableRows()         │
+    │  (uses PhaseStats per node)      │
+    ├──────────────────────────────────┤
+    │  HtmlFragmentBuilder             │  → detail report
+    │  buildNodesSummaryRows()         │    (failed nodes — multi-node)
+    │  buildAllNodeSections()          │    (all nodes   — single-node)
+    └──────────────────────────────────┘
 ```
 
 The design separates concerns into four layers:
 
 1. **API layer** — `ReportGenerator` + `ReportConfig` + `ReportGeneratorResult` — the only surface callers need.
 2. **Reading layer** — `NodeJsonReader` deserialises per-node JSON files into the internal model.
-3. **Rendering layer** — `TemplateEngine` + `HtmlFragmentBuilder` produce the final HTML string.
-4. **Writing layer** — `ReportWriter` persists the HTML to disk.
+3. **Rendering layer** — `TemplateEngine` × 2 + `SummaryHtmlFragmentBuilder` + `HtmlFragmentBuilder` produce two HTML reports.
+4. **Writing layer** — `ReportWriter` persists each HTML report to disk.
 
 ---
 
@@ -105,7 +109,7 @@ library JAR. The fat JAR is a secondary attached artifact.
 
 ```
 com.nokia.report
-├── ReportGenerator              Public API — instantiate to generate a report
+├── ReportGenerator              Public API — instantiate to generate reports
 ├── ReportGeneratorException     Checked exception for all generation failures
 ├── ReportGeneratorMain          CLI entry point (main method only)
 │
@@ -117,7 +121,8 @@ com.nokia.report
 │   ├── ExecutionMetadata        metadata.nodeName
 │   ├── CommandResultDetail      Per-command result fields
 │   ├── NodeExecutionData        Parsed node: name + ordered commands map
-│   ├── ExecutionStats           Computed statistics for one node
+│   ├── ExecutionStats           Computed node-level statistics
+│   ├── PhaseStats               Computed per-phase statistics for one node
 │   └── ReportGeneratorResult    Generation outcome (status / errors / parameters)
 │
 ├── reader
@@ -127,8 +132,8 @@ com.nokia.report
 │   └── TemplateEngine           Loads HTML template; resolves {{PLACEHOLDER}} markers;
 │                                extracts sub-templates
 ├── builder
-│   └── HtmlFragmentBuilder      Builds HTML strings for nodes summary rows and
-│                                per-node detail panels (including phase grouping)
+│   ├── HtmlFragmentBuilder      Builds HTML for detail report (node panels, command rows)
+│   └── SummaryHtmlFragmentBuilder  Builds HTML for summary report (phase breakdown panels)
 │
 └── writer
     └── ReportWriter             Writes the rendered HTML string to a file
@@ -165,18 +170,31 @@ shared.
 or by calling setters directly (e.g. when building from a property map).
 
 ```java
-// Builder
+// Builder — multi-node mode
 ReportConfig config = ReportConfig.builder()
     .nodeType("MRF")
     .activity("ANNOUNCEMENT_LOADING")
     .crGroup("GroupA")
-    .jsonDir("/path/to/jsons")
+    .jsonDir("/path/to/jsons")            // directory of JSON files
     .outputHtmlPath("/path/to/output")
-    .outputHtmlName("report.html")
-    .requestId("CR-98765")           // optional — default: "N/A"
-    .timestamp("2026-04-19 14:00")   // optional — default: current time
-    .nodeNames(nodeList)             // optional — default: all JSON files in jsonDir
-    .templatePath("/custom.html")    // optional — default: built-in classpath template
+    .outputHtmlName("report_detail.html")
+    .summaryHtmlName("report_summary.html")
+    .generateSummary(true)               // optional — default: true
+    .requestId("CR-98765")               // optional — default: "N/A"
+    .timestamp("2026-04-19 14:00")       // optional — default: current time
+    .nodeNames(nodeList)                 // optional — default: all JSON files in jsonDir
+    .templatePath("/custom.html")        // optional — default: built-in detail template
+    .summaryTemplatePath("/custom_sum.html") // optional — default: built-in summary template
+    .build();
+
+// Builder — single-node mode
+ReportConfig single = ReportConfig.builder()
+    .nodeType("MRF")
+    .activity("ANNOUNCEMENT_LOADING")
+    .crGroup("GroupA")
+    .jsonFile("/path/to/MRF1.json")      // single file — summary report skipped
+    .outputHtmlPath("/path/to/output")
+    .outputHtmlName("MRF1_detail.html")
     .build();
 
 // Direct setters (equivalent)
@@ -196,15 +214,24 @@ config.validate(); // throws ReportGeneratorException if invalid
 | `nodeType` | String | Yes | — |
 | `activity` | String | Yes | — |
 | `crGroup` | String | Yes | — |
-| `jsonDir` | String | Yes | — |
+| `jsonDir` | String | One of `jsonDir`/`jsonFile` | — |
+| `jsonFile` | String | One of `jsonDir`/`jsonFile` | — |
 | `outputHtmlPath` | String | Yes | — |
 | `outputHtmlName` | String | Yes | — |
+| `summaryHtmlName` | String | Only when `generateSummary=true` | — |
+| `generateSummary` | boolean | No | `true` |
 | `requestId` | String | No | `"N/A"` |
 | `timestamp` | String | No | Current `yyyy-MM-dd HH:mm:ss` |
 | `nodeNames` | `List<String>` | No | All JSON files in `jsonDir` |
-| `templatePath` | String | No | Built-in classpath template |
+| `templatePath` | String | No | Built-in detail classpath template |
+| `summaryTemplatePath` | String | No | Built-in summary classpath template |
 
-`getOutputHtml()` is a convenience method returning `outputHtmlPath + File.separator + outputHtmlName`.
+`getOutputHtml()` returns `outputHtmlPath + File.separator + outputHtmlName`.
+`getSummaryHtml()` returns `outputHtmlPath + File.separator + summaryHtmlName`.
+
+**`validate()` auto-detection:** if `jsonDir` is set and the path points to a regular file,
+`validate()` promotes it to `jsonFile` (sets `jsonDir = null`). Callers can therefore pass
+a single file path via `--json-dir` without error.
 
 ### 4.3 ReportGeneratorResult
 
@@ -216,14 +243,18 @@ public class ReportGeneratorResult {
     public String  getStatus();          // "SUCCESS" or "FAILED"
     public int     getErrors();          // 0 on success, 1 on failure
     public LinkedHashMap<String, String> getParameters();
-    // On success: parameters contains REPORT_FILENAME=<filename>
+    // On success: parameters may contain:
+    //   SUMMARY_REPORT_FILENAME=<filename>  (omitted in single-node mode or generateSummary=false)
+    //   DETAIL_REPORT_FILENAME=<filename>   (omitted in multi-node mode when all nodes passed)
     // On failure: parameters contains ERROR=<message>
 }
 ```
 
 Static factory methods:
 ```java
-ReportGeneratorResult.success("report.html");
+ReportGeneratorResult.success("summary.html", "detail.html");  // both reports
+ReportGeneratorResult.success("summary.html", null);            // summary only (all passed, multi-node)
+ReportGeneratorResult.success(null, "detail.html");             // detail only (single-node mode)
 ReportGeneratorResult.failure("error message");
 ```
 
@@ -251,12 +282,17 @@ underlying IOException, IllegalArgumentException, or other exception if applicab
 package com.nokia.report.reader;
 
 public class NodeJsonReader {
+    /** Multi-node: reads all *.json files in a directory. */
     public List<NodeExecutionData> read(String jsonDir, List<String> nodeNames)
+            throws IOException;
+
+    /** Single-node: reads exactly one JSON file. */
+    public List<NodeExecutionData> readSingle(String jsonFilePath)
             throws IOException;
 }
 ```
 
-**Behaviour:**
+**`read()` behaviour:**
 - Lists all `*.json` files in `jsonDir`, sorted alphabetically.
 - Deserialises each file into `NodeExecutionJson` using Jackson `ObjectMapper`.
 - Node name is resolved from `metadata.nodeName`; if absent, falls back to filename stem
@@ -266,14 +302,20 @@ public class NodeJsonReader {
   included, in list order. A warning is logged for any requested name with no matching file.
   Throws `IOException` if none of the requested names are found.
 
+**`readSingle()` behaviour:**
+- Deserialises the single specified JSON file.
+- Returns a `List` containing exactly one `NodeExecutionData`.
+- Node name resolution and fallback are identical to `read()`.
+
 ### 5.2 TemplateEngine
 
 ```java
 package com.nokia.report.template;
 
 public class TemplateEngine {
-    public TemplateEngine() throws IOException;                     // classpath template
-    public TemplateEngine(String templatePath) throws IOException;  // external file
+    public TemplateEngine() throws IOException;                                       // built-in detail classpath template
+    public TemplateEngine(String templatePath) throws IOException;                    // external file path
+    public static TemplateEngine fromClasspathResource(String name) throws IOException; // named classpath resource
     public String render(Map<String, String> values);
     public String getSubTemplate(String id);
 }
@@ -296,44 +338,113 @@ Compiled with `Pattern.DOTALL` to match multi-line content.
 
 ### 5.3 HtmlFragmentBuilder
 
+Used for the **detail report** (failed nodes in multi-node mode; the single node in single-node mode).
+
 ```java
 package com.nokia.report.builder;
 
 public class HtmlFragmentBuilder {
-    public HtmlFragmentBuilder(String nodePanelTemplate);
+    public HtmlFragmentBuilder(TemplateEngine engine);
     public String buildNodesSummaryRows(List<NodeExecutionData> nodes);
     public String buildAllNodeSections(List<NodeExecutionData> nodes);
+    public String getRawOutputsJs();
+    public String getValConclusionsJs();
     public static String esc(String s);
     public static String nodeId(String nodeName);
 }
 ```
 
+Constructor loads all required sub-templates from the engine:
+`tpl-node-panel`, `tpl-summary-row`, `tpl-phase-header`, `tpl-command-row`,
+`tpl-val-detail-static`, `tpl-val-detail-expandable`.
+
+#### JS Data Stores (file size optimisation)
+
+During `buildAllNodeSections()` each command row is assigned a unique key (`r0`, `r1`, …).
+Raw command outputs and validation conclusions are stored in two internal maps
+(`rawOutputStore`, `valConclusionStore`) rather than being embedded in the HTML DOM.
+
+After building all sections, call:
+
+- `getRawOutputsJs()` → serialises `rawOutputStore` as a JS object literal for `{{RAW_OUTPUTS_JS}}`
+- `getValConclusionsJs()` → serialises `valConclusionStore` as a JS object literal for `{{VAL_CONCLUSIONS_JS}}`
+
+These are injected into a `<script>` block once in the page. The browser loads raw output and
+validation detail lazily into the DOM only when the user clicks **View Output** / **View Details**.
+This eliminates 70–90% of file size for typical executions with large command outputs.
+
 **`buildNodesSummaryRows`**
-Iterates nodes, computes `ExecutionStats` per node, and emits one `<tr class="summary-row">` per
-node with an `onclick="scrollToNode(...)"` handler.
+Iterates nodes, computes `ExecutionStats` per node, fills `tpl-summary-row` with `{{SR_*}}`
+placeholders and emits one `<tr>` per node.
 
 **`buildAllNodeSections`**
-Iterates nodes, calls `buildNodePanel(node, index)` for each. `buildNodePanel` fills the
-`nodePanelTemplate` string via a chain of `String.replace()` calls on `{{NP_*}}` placeholders,
-with `{{NP_COMMAND_ROWS}}` built by `buildCommandTableRows`.
+Iterates nodes, calls `buildNodePanel(node, index)` for each. `buildNodePanel` fills
+`tpl-node-panel` via `{{NP_*}}` placeholders. `{{NP_COMMAND_ROWS}}` is built by
+`buildCommandTableRows`.
 
 **`buildCommandTableRows`**
 
-1. Groups commands into a `Map<String, List<Entry>>` keyed by phase.
-   Commands with no phase are placed in `"OTHER"`.
-2. Sorts phases by `PHASE_ORDER`; unrecognised phases are appended after.
-3. For each phase emits a `<tr class="phase-header-row" onclick="togglePhase(this)">` spanning
-   all 9 columns, followed by one `<tr class="row-data" data-phase="...">` per command.
-4. The `data-phase` attribute is used by the browser-side XLSX export to populate the Phase
-   column without requiring a visible Phase table column.
+1. Groups commands by phase; commands with no phase go into `"OTHER"`.
+2. Sorts phases by `PHASE_ORDER`; unrecognised phases appended after.
+3. For each phase: fills `tpl-phase-header` (`{{PH_PHASE}}`).
+4. For each command: assigns a unique key, stores output/val-conclusion in JS stores,
+   fills `tpl-command-row` with `{{CR_*}}` placeholders including:
+   - `{{CR_IS_FAILED}}` — `"1"` or `"0"` (drives the per-node Failed Only filter)
+   - `{{CR_KEY}}` — unique row key for JS store lookup
+   - Output cell: `<button onclick="loadOutput(this,'KEY')">` + empty `<div>` (no inline output)
+5. Validation detail uses `tpl-val-detail-static` (success/skipped — text inline) or
+   `tpl-val-detail-expandable` (failed/warning — lazy load button with empty div).
 
 **`esc(String s)`**
-HTML-escapes `&`, `<`, `>`, `"`. Used on all user-data values injected into HTML.
+HTML-escapes `&`, `<`, `>`, `"`.
 
 **`nodeId(String nodeName)`**
-Replaces all characters outside `[a-zA-Z0-9_-]` with `_` to produce a safe HTML `id` attribute.
+Replaces non-`[a-zA-Z0-9_-]` characters with `_`.
 
-**Phase order constant:**
+**`toJsObject / jsonString`** (private)
+Serialises the output/val-conclusion maps to compact JSON without adding a new dependency.
+Handles `"`, `\`, `\n`, `\r`, `\t`, and control characters.
+
+### 5.3a SummaryHtmlFragmentBuilder
+
+Used for the **summary report** (all nodes).
+
+```java
+package com.nokia.report.builder;
+
+public class SummaryHtmlFragmentBuilder {
+    public SummaryHtmlFragmentBuilder(TemplateEngine engine);
+    public String buildSummaryPhaseHeaders(List<NodeExecutionData> nodes);
+    public String buildSummaryTableRows(List<NodeExecutionData> nodes);
+}
+```
+
+The summary template no longer uses sub-templates; HTML is generated directly in Java.
+
+**`buildSummaryPhaseHeaders`**
+Calls `collectPhases(nodes)` to determine visible columns, then emits one
+`<th class="col-phase">` element per phase for `{{SUMMARY_PHASE_HEADERS}}`.
+
+**`buildSummaryTableRows`**
+For each node emits one `<tr>`. Each row has: node name cell, one cell per phase (PASSED /
+FAILED badge, or **SKIPPED** grey badge if the node has no commands in that phase), and an
+Overall status cell. The row class is `row-failed` when the node failed.
+Uses `PhaseStats.from(node)` to build a phase→PhaseStats lookup map per node.
+
+**`buildNodePhaseSummaryRows(NodeExecutionData node)`**
+Used by the **single-node detail report**. Iterates `PhaseStats.from(node)` and emits one
+`<tr>` per phase with columns: Phase | Total | Success | Failed | Status (PASSED/FAILED badge).
+Failed phase rows get the `phase-failed` CSS class (red background).
+Fills the `{{PHASE_SUMMARY_ROWS}}` placeholder in the single-node template.
+
+**`collectPhases(nodes)`** (private)
+- Collects all phases that appear in at least one node's data.
+- **Phases absent from all nodes are excluded entirely** — they are not added as columns.
+- Sorts the result: known phases first in `PHASE_ORDER`, then any unrecognised phases in
+  first-seen order.
+
+**Phase order constant** (all three of `HtmlFragmentBuilder`, `SummaryHtmlFragmentBuilder`,
+`PhaseStats` — must be kept in sync):
 ```java
 private static final List<String> PHASE_ORDER = Arrays.asList(
     "PRE_NODE_HEALTH_CHECK",
@@ -341,10 +452,10 @@ private static final List<String> PHASE_ORDER = Arrays.asList(
     "ACTIVITY_PRECHECK",
     "ACTIVITY_CONFIGURATION",
     "ACTIVITY_POSTCHECK",
-    "POST_NODE_HEALTH_CHECK",
     "ROLLBACK_PRECHECK",
     "ROLLBACK_CONFIGURATION",
-    "ROLLBACK_POSTCHECK"
+    "ROLLBACK_POSTCHECK",
+    "POST_NODE_HEALTH_CHECK"
 );
 ```
 
@@ -375,6 +486,7 @@ NodeExecutionJson
     └── key = command string
         └── CommandResultDetail
             ├── phase:                     String
+            ├── target:                    String
             ├── description:               String
             ├── success:                   boolean
             ├── reason:                    String
@@ -418,37 +530,83 @@ Built on demand by `ExecutionStats.from(NodeExecutionData)`:
 | `infoOnly` | Commands where `validation_status == "skipped"` |
 | `overallStatus` | `"FAILED"` if `failed > 0`, else `"SUCCESS"` |
 
+### PhaseStats (computed)
+
+Built on demand by `PhaseStats.from(NodeExecutionData)`. Returns a `List<PhaseStats>` sorted
+by the standard `PHASE_ORDER`; unrecognised phases are appended at the end.
+
+| Field | Computed as |
+|---|---|
+| `phase` | Phase name (normalised; blank → `"OTHER"`) |
+| `total` | Commands in that phase |
+| `success` | Commands in that phase where `success == true` |
+| `failed` | Commands in that phase where `success == false` |
+| `isSuccess()` | `true` if `failed == 0` |
+
+Used by `SummaryHtmlFragmentBuilder` to build per-phase table rows in the summary report.
+
 ---
 
 ## 7. HTML Template System
 
-The template file (`mop_execution_report_template.html`) serves a dual purpose:
+Three template files are used:
+
+| File | Purpose |
+|---|---|
+| `mop_execution_report_template.html` | Multi-node detail report — command table + node search/pagination |
+| `mop_execution_single_node_report_template.html` | Single-node detail report — phase summary table + auto-expanded node panel |
+| `mop_execution_summary_report_template.html` | Multi-node summary report — phase matrix table |
+
+Each template file serves a dual purpose:
 
 1. **Main template** — the outer HTML page with `{{PLACEHOLDER}}` markers.
 2. **Sub-template host** — contains `<script type="text/x-html-template">` blocks that are
    extracted by `TemplateEngine` before rendering. These blocks never appear in the final output.
 
+The single-node template includes a stub `tpl-summary-row` sub-template (empty content) to
+satisfy the `HtmlFragmentBuilder` constructor, which always loads all sub-templates at
+construction time. The stub is never used for rendering.
+
 ### Rendering Pipeline
 
 ```
-Template file (HTML)
+Summary template (multi-node)
        │
        ▼
-TemplateEngine.process()
-  ├── Extracts <script type="text/x-html-template"> blocks → subTemplates map
-  └── Returns main template string (blocks removed)
+TemplateEngine.fromClasspathResource("mop_execution_summary_report_template.html")
+  └── No sub-templates needed
        │
        ▼
-ReportGenerator.doGenerate()
-  ├── Retrieves "tpl-node-panel" sub-template
-  ├── Builds values map (placeholders → replacement strings)
-  │     ├── Scalar values: PAGE_TITLE, META_*, TOTAL_NODES, etc.
-  │     ├── NODES_SUMMARY_ROWS: HtmlFragmentBuilder.buildNodesSummaryRows()
-  │     └── NODE_DETAIL_SECTIONS: HtmlFragmentBuilder.buildAllNodeSections()
-  └── Calls TemplateEngine.render(values)
+SummaryHtmlFragmentBuilder
+  ├── buildSummaryPhaseHeaders(nodes)
+  └── buildSummaryTableRows(nodes)
        │
        ▼
-Final HTML string → ReportWriter.write()
+values → summaryEngine.render() → ReportWriter.write(summaryHtml)
+
+
+Multi-node detail template                Single-node detail template
+       │                                         │
+       ▼                                         ▼
+TemplateEngine()                    TemplateEngine.fromClasspathResource(
+  └── Extracts tpl-node-panel,        "mop_execution_single_node_report_template.html")
+      tpl-summary-row,                  └── Extracts tpl-node-panel, tpl-summary-row (stub),
+      tpl-phase-header,                     tpl-phase-header, tpl-command-row,
+      tpl-command-row,                      tpl-val-detail-*
+      tpl-val-detail-*                        │
+       │                                      ▼
+       ▼                              SummaryHtmlFragmentBuilder
+HtmlFragmentBuilder                    └── buildNodePhaseSummaryRows(node) → PHASE_SUMMARY_ROWS
+  ├── buildNodesSummaryRows(nodes)             │
+  ├── buildAllNodeSections(nodes)     HtmlFragmentBuilder
+  ├── getRawOutputsJs()     ← JS       └── buildAllNodeSections([node])
+  └── getValConclusionsJs() ← JS           └── getRawOutputsJs() / getValConclusionsJs()
+       │                                        │
+       ▼                                        ▼
+values → detailEngine.render()         values → detailEngine.render()
+       │                                        │
+       ▼                                        ▼
+ReportWriter.write(detailHtml)         ReportWriter.write(detailHtml)
 ```
 
 ### Placeholder Resolution
@@ -466,43 +624,72 @@ through `HtmlFragmentBuilder.esc()` before being placed in the values map).
 ReportGenerator.generate(config)
 │
 ├── 1. config.validate()
-│      ├── Check required fields (nodeType, activity, crGroup, jsonDir,
-│      │   outputHtmlPath, outputHtmlName)
+│      ├── Check required fields (nodeType, activity, crGroup,
+│      │   one of jsonDir/jsonFile, outputHtmlPath, outputHtmlName)
+│      ├── summaryHtmlName required only when generateSummary=true
 │      ├── Apply defaults (requestId="N/A", timestamp=now)
-│      └── Validate paths (jsonDir exists + is directory;
+│      ├── Auto-detect: if jsonDir path is a file → promote to jsonFile
+│      └── Validate paths (jsonDir exists + is directory, or jsonFile exists;
 │                          outputHtmlPath exists or is created)
 │
-├── 2. NodeJsonReader.read(jsonDir, nodeNames)
-│      ├── List *.json files, sort alphabetically
-│      ├── Parse each file → NodeExecutionJson (Jackson)
-│      ├── Resolve node name (metadata.nodeName or filename stem)
-│      └── Filter/order by nodeNames if provided
+├── 2. Load nodes
+│      ├── singleNode = (jsonFile != null)
+│      ├── If singleNode: NodeJsonReader.readSingle(jsonFile) → 1 node
+│      └── If multi-node: NodeJsonReader.read(jsonDir, nodeNames) → N nodes
 │
 ├── 3. Compute overall stats
-│      └── Count passed/failed nodes via ExecutionStats.from()
+│      └── Partition nodes into passed/failedNodes via ExecutionStats.from()
 │
-├── 4. TemplateEngine(templatePath or classpath)
-│      ├── Load HTML template
-│      └── Extract sub-templates → subTemplates map
+├── 4a. Summary report — all nodes (skipped if generateSummary=false or singleNode=true)
+│      ├── Load summary TemplateEngine
+│      │     (summaryTemplatePath if set, else classpath "mop_execution_summary_report_template.html")
+│      ├── SummaryHtmlFragmentBuilder(summaryEngine)
+│      ├── Build summary values map
+│      │     ├── Scalar placeholders (PAGE_TITLE, META_*, node counts for all nodes)
+│      │     ├── SUMMARY_PHASE_HEADERS → buildSummaryPhaseHeaders(nodes)
+│      │     │     └── collectPhases(): union of phases across all nodes, sorted by PHASE_ORDER
+│      │     │         Phases absent from all nodes excluded entirely.
+│      │     └── SUMMARY_TABLE_ROWS → buildSummaryTableRows(nodes)
+│      │           └── Per node: one <tr>; per phase: PASSED/FAILED/SKIPPED badge
+│      ├── summaryEngine.render(summaryValues) → HTML string
+│      └── ReportWriter.write(summaryHtml, getSummaryHtml())
 │
-├── 5. Build HTML values map
-│      ├── Scalar placeholders (PAGE_TITLE, META_*, node counts)
-│      ├── NODES_SUMMARY_ROWS → HtmlFragmentBuilder.buildNodesSummaryRows()
-│      └── NODE_DETAIL_SECTIONS → HtmlFragmentBuilder.buildAllNodeSections()
-│             └── Per node: buildNodePanel()
-│                   └── buildCommandTableRows()
-│                         ├── Group commands by phase
-│                         ├── Sort phases by PHASE_ORDER
-│                         └── Emit phase-header-row + row-data rows
+├── 4b. Detail report
+│      ├── detailNodes = singleNode ? nodes : failedNodes
+│      ├── Skipped if detailNodes is empty (multi-node, all passed)
+│      ├── Load TemplateEngine:
+│      │     singleNode → templatePath if set, else classpath
+│      │     │            "mop_execution_single_node_report_template.html"
+│      │     multi-node → templatePath if set, else classpath
+│      │                  "mop_execution_report_template.html"
+│      ├── HtmlFragmentBuilder(detailEngine)
+│      ├── Build detail values map
+│      │     ├── If singleNode:
+│      │     │     PHASE_SUMMARY_ROWS → SummaryHtmlFragmentBuilder
+│      │     │                          .buildNodePhaseSummaryRows(detailNodes[0])
+│      │     │                          (Phase|Total|Success|Failed|Status per phase)
+│      │     ├── If multi-node:
+│      │     │     STAT_LABEL_TOTAL="Total Nodes", STAT_LABEL_PASSED="Nodes Passed" (0),
+│      │     │     STAT_LABEL_FAILED="Nodes Failed", counts = detailNodes.size()
+│      │     │     NODES_SUMMARY_ROWS → buildNodesSummaryRows(detailNodes)
+│      │     ├── NODE_DETAIL_SECTIONS → buildAllNodeSections(detailNodes)
+│      │     │     └── Per node: buildNodePanel()
+│      │     │           └── buildCommandTableRows()
+│      │     │                 ├── Group by phase; sort by PHASE_ORDER
+│      │     │                 ├── Assign unique key per command row
+│      │     │                 ├── Store raw output in rawOutputStore[key]
+│      │     │                 ├── Store val conclusion in valConclusionStore[key]
+│      │     │                 ├── Emit data-failed="0|1" on each row
+│      │     │                 └── Fill tpl-phase-header + tpl-command-row (no inline output)
+│      │     ├── RAW_OUTPUTS_JS → getRawOutputsJs()     (compact JSON object)
+│      │     └── VAL_CONCLUSIONS_JS → getValConclusionsJs() (compact JSON object)
+│      ├── detailEngine.render(detailValues) → HTML string
+│      └── ReportWriter.write(detailHtml, getOutputHtml())
 │
-├── 6. TemplateEngine.render(values) → HTML string
-│
-├── 7. ReportWriter.write(html, outputPath)
-│
-└── 8. Return ReportGeneratorResult.success(filename)
+└── 5. Return ReportGeneratorResult.success(summaryFilename|null, detailFilename|null)
 ```
 
-Any exception in steps 2–7 is wrapped in a `ReportGeneratorException` and re-thrown.
+Any exception in steps 2–4 is wrapped in a `ReportGeneratorException` and re-thrown.
 
 ---
 
@@ -519,6 +706,14 @@ Any exception in steps 2–7 is wrapped in a `ReportGeneratorException` and re-t
 The CLI does **not** call `config.validate()` directly — validation is performed inside
 `ReportGenerator.generate()`. Any `ReportGeneratorException` or unexpected exception is caught,
 wrapped in a `ReportGeneratorResult.failure(message)`, and printed.
+
+**Supported flags:**
+`--node-type`, `--activity`, `--cr-group`, `--json-dir`, `--json-file`, `--output-html-path`,
+`--output-html-name`, `--output-summary-name`, `--generate-summary`, `--request-id`,
+`--timestamp`, `--node-names`, `--template`, `--summary-template`.
+
+`--generate-summary false` sets `config.setGenerateSummary(false)`.
+`--json-file <path>` sets `config.setJsonFile(path)`.
 
 **Arg parser note:** The loop runs `for (i = 0; i < args.length - 1; i++)`, meaning the last
 token is skipped if it stands alone (i.e. is not the value following a recognised flag). This is
@@ -545,8 +740,14 @@ followed by a value.
 ### Custom HTML Template
 
 Pass an external template file via `ReportConfig.builder().templatePath(...)`.
-The template must include all required `{{PLACEHOLDER}}` markers and the
-`<script type="text/x-html-template" id="tpl-node-panel">` sub-template block.
+The template path is used for **both** single-node and multi-node detail reports when set,
+so ensure it contains the appropriate `{{PLACEHOLDER}}` markers for the target mode.
+
+Any custom detail template must include all required sub-template blocks consumed by
+`HtmlFragmentBuilder`:
+- `tpl-node-panel`, `tpl-summary-row` (stub is fine for single-node), `tpl-phase-header`
+- `tpl-command-row`, `tpl-val-detail-static`, `tpl-val-detail-expandable`
+
 See the [User Manual — section 11](USER_MANUAL.md#11-custom-html-template) for the full
 placeholder reference.
 
@@ -560,8 +761,13 @@ placeholder reference.
 
 ### Changing Phase Order
 
-Edit `HtmlFragmentBuilder.PHASE_ORDER`. Add, remove, or reorder entries. Phases not in the
-list are still displayed — they are appended after all known phases in first-seen order.
+The `PHASE_ORDER` constant is duplicated in three classes:
+- `HtmlFragmentBuilder` (detail report command grouping)
+- `SummaryHtmlFragmentBuilder` (summary report column ordering)
+- `PhaseStats` (per-phase stats computation)
+
+Edit all three to keep them in sync. Phases not in the list are still displayed — they are
+appended after all known phases in first-seen order.
 
 ### Replacing the JSON Reader
 

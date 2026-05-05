@@ -36,14 +36,28 @@ public class TemplateEngine {
     private final String templateContent;
     private final Map<String, String> subTemplates = new LinkedHashMap<>();
 
-    /** Load template from the built-in classpath resource. */
+    /** Load template from the built-in classpath resource (detail report). */
     public TemplateEngine() throws IOException {
-        this.templateContent = process(loadFromClasspath());
+        this.templateContent = process(loadFromClasspath(TEMPLATE_RESOURCE));
     }
 
     /** Load template from an external file path. */
     public TemplateEngine(String templatePath) throws IOException {
         this.templateContent = process(loadFromFile(templatePath));
+    }
+
+    /**
+     * Load a named template from the classpath.
+     * The resource name should not include a leading slash; it is resolved
+     * relative to the root of the classpath (e.g. {@code "mop_summary_report_template.html"}).
+     */
+    public static TemplateEngine fromClasspathResource(String resourceName) throws IOException {
+        return new TemplateEngine(resourceName, true);
+    }
+
+    /** Internal constructor for classpath-by-name loading. */
+    private TemplateEngine(String resourceName, boolean isClasspath) throws IOException {
+        this.templateContent = process(loadFromClasspath("/" + resourceName));
     }
 
     /**
@@ -114,14 +128,14 @@ public class TemplateEngine {
         }
     }
 
-    private String loadFromClasspath() throws IOException {
-        InputStream is = TemplateEngine.class.getResourceAsStream(TEMPLATE_RESOURCE);
+    private String loadFromClasspath(String resourcePath) throws IOException {
+        InputStream is = TemplateEngine.class.getResourceAsStream(resourcePath);
         if (is == null) {
-            throw new IOException("HTML template not found on classpath: " + TEMPLATE_RESOURCE);
+            throw new IOException("HTML template not found on classpath: " + resourcePath);
         }
         try {
             byte[] bytes = readAllBytes(is);
-            log.debug("Loaded template from classpath ({} bytes)", bytes.length);
+            log.debug("Loaded template from classpath '{}' ({} bytes)", resourcePath, bytes.length);
             return new String(bytes, StandardCharsets.UTF_8);
         } finally {
             is.close();

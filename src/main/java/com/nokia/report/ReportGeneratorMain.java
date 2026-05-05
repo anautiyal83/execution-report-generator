@@ -31,11 +31,15 @@ import java.util.Arrays;
  *       --cr-group         GroupA                                      \
  *       --json-dir         /path/to/execution/jsons                    \
  *       --output-html-path /path/to/output/directory                   \
- *       --output-html-name report.html                                  \
- *       --template         /path/to/mop_execution_report_template.html \
- *       [--node-names      node1,node2,node3]                          \
- *       [--request-id      CR-12345]                                   \
- *       [--timestamp       "2026-04-18 10:00:00"]
+ *       --output-html-name    report.html                                      \
+ *       --output-summary-name summary.html                                   \
+ *       [--json-file          /path/to/MRF1.json]                            \
+ *       [--generate-summary   true|false]                                    \
+ *       [--template           /path/to/mop_execution_report_template.html]   \
+ *       [--summary-template   /path/to/mop_summary_report_template.html]     \
+ *       [--node-names         node1,node2,node3]                             \
+ *       [--request-id         CR-12345]                                      \
+ *       [--timestamp          "2026-04-18 10:00:00"]
  * </pre>
  */
 public class ReportGeneratorMain {
@@ -67,15 +71,19 @@ public class ReportGeneratorMain {
 
         for (int i = 0; i < args.length - 1; i++) {
             switch (args[i]) {
-                case "--node-type":        config.setNodeType(args[++i]);       break;
-                case "--activity":         config.setActivity(args[++i]);       break;
-                case "--cr-group":         config.setCrGroup(args[++i]);        break;
-                case "--json-dir":         config.setJsonDir(args[++i]);        break;
-                case "--output-html-path": config.setOutputHtmlPath(args[++i]); break;
-                case "--output-html-name": config.setOutputHtmlName(args[++i]); break;
-                case "--template":         config.setTemplatePath(args[++i]);   break;
-                case "--request-id":       config.setRequestId(args[++i]);      break;
-                case "--timestamp":        config.setTimestamp(args[++i]);      break;
+                case "--node-type":           config.setNodeType(args[++i]);            break;
+                case "--activity":            config.setActivity(args[++i]);            break;
+                case "--cr-group":            config.setCrGroup(args[++i]);             break;
+                case "--json-dir":            config.setJsonDir(args[++i]);             break;
+                case "--json-file":           config.setJsonFile(args[++i]);            break;
+                case "--output-html-path":    config.setOutputHtmlPath(args[++i]);      break;
+                case "--output-html-name":    config.setOutputHtmlName(args[++i]);      break;
+                case "--output-summary-name": config.setSummaryHtmlName(args[++i]);     break;
+                case "--generate-summary":    config.setGenerateSummary(!"false".equalsIgnoreCase(args[++i])); break;
+                case "--template":            config.setTemplatePath(args[++i]);        break;
+                case "--summary-template":    config.setSummaryTemplatePath(args[++i]); break;
+                case "--request-id":          config.setRequestId(args[++i]);           break;
+                case "--timestamp":           config.setTimestamp(args[++i]);           break;
                 case "--node-names":
                     String[] names = args[++i].split(",");
                     for (int j = 0; j < names.length; j++) names[j] = names[j].trim();
@@ -84,7 +92,7 @@ public class ReportGeneratorMain {
                 default: break;
             }
         }
-
+        
         return config;
         // validation is performed inside ReportGenerator.generate() via config.validate()
     }
