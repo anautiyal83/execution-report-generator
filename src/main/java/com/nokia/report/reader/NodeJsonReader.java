@@ -67,10 +67,16 @@ public class NodeJsonReader {
                 log.warn("Duplicate nodeName '{}' from file '{}' — skipping", nodeName, f.getName());
                 continue;
             }
+            boolean notExecuted = raw.getData() == null;
             NodeExecutionData data = new NodeExecutionData(nodeName, raw.getData());
+            if (notExecuted) data.setNotExecuted(true);
             applyTiming(data, raw);
             dataMap.put(nodeName, data);
-            log.info("Loaded {} commands for node '{}' from {}", raw.getData().size(), nodeName, f.getName());
+            if (notExecuted) {
+                log.info("Node '{}' loaded as NOT_EXECUTED from {}", nodeName, f.getName());
+            } else {
+                log.info("Loaded {} commands for node '{}' from {}", raw.getData().size(), nodeName, f.getName());
+            }
         }
 
         // Filter / order by requested node names, or return all in file order
@@ -106,8 +112,14 @@ public class NodeJsonReader {
         }
         NodeExecutionJson raw = parseFile(f);
         String nodeName = resolveNodeName(raw, f);
-        log.info("Loaded {} commands for node '{}' from {}", raw.getData().size(), nodeName, f.getName());
+        boolean notExecuted = raw.getData() == null;
         NodeExecutionData data = new NodeExecutionData(nodeName, raw.getData());
+        if (notExecuted) {
+            data.setNotExecuted(true);
+            log.info("Node '{}' loaded as NOT_EXECUTED from {}", nodeName, f.getName());
+        } else {
+            log.info("Loaded {} commands for node '{}' from {}", raw.getData().size(), nodeName, f.getName());
+        }
         applyTiming(data, raw);
         List<NodeExecutionData> result = new ArrayList<>();
         result.add(data);
@@ -118,7 +130,10 @@ public class NodeJsonReader {
         try {
             NodeExecutionJson raw = mapper.readValue(f, NodeExecutionJson.class);
             if (raw.getData() == null) {
-                throw new IOException("Missing 'data' section in: " + f.getName());
+                String status = raw.getMetadata() != null ? raw.getMetadata().getOverallStatus() : null;
+                if (!"NOT_EXECUTED".equalsIgnoreCase(status)) {
+                    throw new IOException("Missing 'data' section in: " + f.getName());
+                }
             }
             return raw;
         } catch (IOException e) {

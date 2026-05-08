@@ -14,14 +14,18 @@ public class NodeExecutionData {
     private final LinkedHashMap<String, CommandResultDetail> commands;
     private String activityStartTime;
     private String activityEndTime;
+    private boolean notExecuted;
 
     public NodeExecutionData(String nodeName, LinkedHashMap<String, CommandResultDetail> commands) {
         this.nodeName = nodeName;
-        this.commands = commands;
+        this.commands = commands != null ? commands : new LinkedHashMap<>();
     }
 
     public String getNodeName()                                      { return nodeName; }
     public LinkedHashMap<String, CommandResultDetail> getCommands()  { return commands; }
+
+    public boolean isNotExecuted()                                   { return notExecuted; }
+    public void setNotExecuted(boolean notExecuted)                  { this.notExecuted = notExecuted; }
 
     public String getActivityStartTime()                             { return activityStartTime; }
     public void setActivityStartTime(String activityStartTime)       { this.activityStartTime = activityStartTime; }

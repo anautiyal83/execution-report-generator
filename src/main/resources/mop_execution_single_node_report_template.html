@@ -29,7 +29,7 @@
     .section-block-body { padding: 16px 18px; }
 
     /* ── Badges ──────────────────────────────────────────────────────────── */
-    .badge { display: inline-block; padding: 1px 7px; border-radius: 10px; font-size: 10px; font-weight: 600; }
+    .badge { display: inline-block; padding: 1px 5px; border-radius: 10px; font-size: 9px; font-weight: 600; white-space: nowrap; }
     .badge-success  { background: #d4edda; color: #155724; }
     .badge-error    { background: #f8d7da; color: #721c24; }
     .badge-warning  { background: #fff3cd; color: #856404; }
@@ -280,7 +280,7 @@
 
 <script type="text/x-html-template" id="tpl-phase-header">
 <tr class="phase-header-row" onclick="togglePhase(this)">
-  <td colspan="13"><span class="phase-toggle-icon">&#9660;</span> {{PH_PHASE}}</td>
+  <td colspan="13"><span class="phase-toggle-icon">&#9660;</span> {{PH_PHASE}} <span class="badge {{PH_BADGE_CLS}}">{{PH_STATUS}}</span></td>
 </tr>
 </script>
 

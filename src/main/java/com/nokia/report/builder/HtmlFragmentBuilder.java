@@ -72,10 +72,11 @@ public class HtmlFragmentBuilder {
         for (NodeExecutionData node : nodes) {
             ExecutionStats s = ExecutionStats.from(node);
             String nid = nodeId(node.getNodeName());
+            String badgeCls = s.isNotExecuted() ? "badge-warning" : (s.isSuccess() ? "badge-success" : "badge-error");
             sb.append(summaryRowTemplate
                 .replace("{{SR_NID}}",        nid)
                 .replace("{{SR_NAME}}",        esc(node.getNodeName()))
-                .replace("{{SR_BADGE_CLS}}",   s.isSuccess() ? "badge-success" : "badge-error")
+                .replace("{{SR_BADGE_CLS}}",   badgeCls)
                 .replace("{{SR_STATUS}}",      s.getOverallStatus())
                 .replace("{{SR_TOTAL}}",       String.valueOf(s.getTotal()))
                 .replace("{{SR_SUCCESS}}",     String.valueOf(s.getSuccess()))
@@ -108,12 +109,14 @@ public class HtmlFragmentBuilder {
     private String buildNodePanel(NodeExecutionData node, int index) {
         ExecutionStats s = ExecutionStats.from(node);
         String nid = nodeId(node.getNodeName());
+        String panelCls = s.isNotExecuted() ? " panel-not-executed" : (s.isSuccess() ? "" : " panel-failed");
+        String badgeCls = s.isNotExecuted() ? "badge-warning" : (s.isSuccess() ? "badge-success" : "badge-error");
         return nodePanelTemplate
-            .replace("{{NP_PANEL_CLS}}",    s.isSuccess() ? "" : " panel-failed")
+            .replace("{{NP_PANEL_CLS}}",    panelCls)
             .replace("{{NP_ID}}",           nid)
             .replace("{{NP_INDEX}}",        String.valueOf(index))
             .replace("{{NP_NAME}}",         esc(node.getNodeName()))
-            .replace("{{NP_BADGE_CLS}}",    s.isSuccess() ? "badge-success" : "badge-error")
+            .replace("{{NP_BADGE_CLS}}",    badgeCls)
             .replace("{{NP_STATUS}}",       s.getOverallStatus())
             .replace("{{NP_TOTAL}}",        String.valueOf(s.getTotal()))
             .replace("{{NP_SUCCESS}}",      String.valueOf(s.getSuccess()))
@@ -126,7 +129,9 @@ public class HtmlFragmentBuilder {
             .replace("{{NP_START_TIME}}",   esc(orNA(node.getActivityStartTime())))
             .replace("{{NP_END_TIME}}",     esc(orNA(node.getActivityEndTime())))
             .replace("{{NP_DURATION}}",     computeDuration(node.getActivityStartTime(), node.getActivityEndTime()))
-            .replace("{{NP_COMMAND_ROWS}}", buildCommandTableRows(node));
+            .replace("{{NP_COMMAND_ROWS}}", node.isNotExecuted()
+                ? "<tr><td colspan=\"13\" style=\"text-align:center;padding:16px;font-style:italic;color:#888;\">Execution not started — no commands to display</td></tr>"
+                : buildCommandTableRows(node));
     }
 
     // -------------------------------------------------------------------------
@@ -148,7 +153,14 @@ public class HtmlFragmentBuilder {
 
         StringBuilder sb = new StringBuilder();
         for (String phase : sortedPhases) {
-            sb.append(phaseHeaderTemplate.replace("{{PH_PHASE}}", esc(phase)));
+            boolean phaseFailed = byPhase.get(phase).stream().anyMatch(e -> {
+                CommandResultDetail d = e.getValue();
+                return !d.isSuccess() || "FAILED".equalsIgnoreCase(d.getValidationStatus());
+            });
+            sb.append(phaseHeaderTemplate
+                    .replace("{{PH_PHASE}}", esc(phase))
+                    .replace("{{PH_BADGE_CLS}}", phaseFailed ? "badge-error" : "badge-success")
+                    .replace("{{PH_STATUS}}", phaseFailed ? "FAILED" : "PASSED"));
             for (Map.Entry<String, CommandResultDetail> entry : byPhase.get(phase)) {
                 sb.append(buildCommandRow(phase, entry.getKey(), entry.getValue()));
             }

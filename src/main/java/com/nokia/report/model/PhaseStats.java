@@ -53,7 +53,8 @@ public class PhaseStats {
             if (!byPhase.containsKey(ph)) byPhase.put(ph, new int[3]);
             int[] s = byPhase.get(ph);
             s[0]++;
-            if (d.isSuccess()) s[1]++; else s[2]++;
+            boolean commandFailed = !d.isSuccess() || "FAILED".equalsIgnoreCase(d.getValidationStatus());
+            if (!commandFailed) s[1]++; else s[2]++;
         }
 
         List<String> sorted = new ArrayList<>();

@@ -80,7 +80,10 @@ public class SummaryHtmlFragmentBuilder {
 
         for (NodeExecutionData node : nodes) {
             ExecutionStats s = ExecutionStats.from(node);
-            boolean nodeOk = s.isSuccess();
+            boolean nodeOk       = s.isSuccess();
+            boolean notExecuted  = s.isNotExecuted();
+            String rowCls        = notExecuted ? "row-not-executed" : (nodeOk ? "" : "row-failed");
+            String overallBadge  = notExecuted ? "badge-warning" : (nodeOk ? "badge-success" : "badge-error");
 
             // Build phase → stats map for quick lookup
             Map<String, PhaseStats> phaseMap = new LinkedHashMap<>();
@@ -88,7 +91,7 @@ public class SummaryHtmlFragmentBuilder {
                 phaseMap.put(ps.getPhase(), ps);
             }
 
-            sb.append("<tr class=\"").append(nodeOk ? "" : "row-failed").append("\">");
+            sb.append("<tr class=\"").append(rowCls).append("\">");
 
             // Node name cell
             sb.append("<td class=\"col-node\">")
@@ -97,22 +100,26 @@ public class SummaryHtmlFragmentBuilder {
 
             // One cell per phase
             for (String phase : phases) {
-                PhaseStats ps = phaseMap.get(phase);
-                if (ps == null) {
-                    sb.append("<td><span class=\"badge badge-skipped\">SKIPPED</span></td>");
+                if (notExecuted) {
+                    sb.append("<td><span class=\"badge badge-warning\">NOT EXECUTED</span></td>");
                 } else {
-                    boolean phaseOk = ps.isSuccess();
-                    sb.append("<td><span class=\"badge ")
-                      .append(phaseOk ? "badge-success" : "badge-error")
-                      .append("\">")
-                      .append(phaseOk ? "PASSED" : "FAILED")
-                      .append("</span></td>");
+                    PhaseStats ps = phaseMap.get(phase);
+                    if (ps == null) {
+                        sb.append("<td><span class=\"badge badge-skipped\">SKIPPED</span></td>");
+                    } else {
+                        boolean phaseOk = ps.isSuccess();
+                        sb.append("<td><span class=\"badge ")
+                          .append(phaseOk ? "badge-success" : "badge-error")
+                          .append("\">")
+                          .append(phaseOk ? "PASSED" : "FAILED")
+                          .append("</span></td>");
+                    }
                 }
             }
 
             // Overall status cell
             sb.append("<td class=\"col-overall\"><span class=\"badge ")
-              .append(nodeOk ? "badge-success" : "badge-error")
+              .append(overallBadge)
               .append("\">")
               .append(s.getOverallStatus())
               .append("</span></td>");

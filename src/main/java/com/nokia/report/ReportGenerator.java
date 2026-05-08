@@ -80,12 +80,15 @@ public class ReportGenerator {
         // 2. Compute overall stats
         boolean singleNode = config.getJsonFile() != null;
         int total  = nodes.size();
-        List<NodeExecutionData> failedNodes = new ArrayList<>();
+        List<NodeExecutionData> failedNodes      = new ArrayList<>();
+        List<NodeExecutionData> notExecutedNodes = new ArrayList<>();
         for (NodeExecutionData n : nodes) {
-            if (!ExecutionStats.from(n).isSuccess()) failedNodes.add(n);
+            ExecutionStats s = ExecutionStats.from(n);
+            if (s.isNotExecuted()) notExecutedNodes.add(n);
+            else if (!s.isSuccess()) failedNodes.add(n);
         }
-        int passed = total - failedNodes.size();
-        int failed = failedNodes.size();
+        int passed      = total - failedNodes.size() - notExecutedNodes.size();
+        int failed      = failedNodes.size();
 
         // 3. Shared metadata values
         String nodeTypeSafe  = HtmlFragmentBuilder.esc(config.getNodeType());
@@ -128,6 +131,7 @@ public class ReportGenerator {
         // ── 4b. Detail report ────────────────────────────────────────────────
         // Single-node: always generate, use single-node template (phase summary + detail).
         // Multi-node:  generate only when there are failed nodes, use standard detail template.
+        //              NOT_EXECUTED nodes are excluded from detail (no commands to show).
         List<NodeExecutionData> detailNodes = singleNode ? nodes : failedNodes;
         String detailFilename = null;
         if (!detailNodes.isEmpty()) {

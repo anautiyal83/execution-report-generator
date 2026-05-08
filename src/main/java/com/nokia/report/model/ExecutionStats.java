@@ -13,34 +13,43 @@ public class ExecutionStats {
     private final int valFail;
     private final int valWarn;
     private final int infoOnly;
+    private final boolean notExecuted;
 
     public ExecutionStats(int total, int success, int failed,
                           int valEnabled, int valPass, int valFail,
-                          int valWarn, int infoOnly) {
-        this.total      = total;
-        this.success    = success;
-        this.failed     = failed;
-        this.valEnabled = valEnabled;
-        this.valPass    = valPass;
-        this.valFail    = valFail;
-        this.valWarn    = valWarn;
-        this.infoOnly   = infoOnly;
+                          int valWarn, int infoOnly, boolean notExecuted) {
+        this.total       = total;
+        this.success     = success;
+        this.failed      = failed;
+        this.valEnabled  = valEnabled;
+        this.valPass     = valPass;
+        this.valFail     = valFail;
+        this.valWarn     = valWarn;
+        this.infoOnly    = infoOnly;
+        this.notExecuted = notExecuted;
     }
 
-    public int getTotal()      { return total; }
-    public int getSuccess()    { return success; }
-    public int getFailed()     { return failed; }
-    public int getValEnabled() { return valEnabled; }
-    public int getValPass()    { return valPass; }
-    public int getValFail()    { return valFail; }
-    public int getValWarn()    { return valWarn; }
-    public int getInfoOnly()   { return infoOnly; }
+    public int getTotal()         { return total; }
+    public int getSuccess()       { return success; }
+    public int getFailed()        { return failed; }
+    public int getValEnabled()    { return valEnabled; }
+    public int getValPass()       { return valPass; }
+    public int getValFail()       { return valFail; }
+    public int getValWarn()       { return valWarn; }
+    public int getInfoOnly()      { return infoOnly; }
+    public boolean isNotExecuted(){ return notExecuted; }
 
-    public String getOverallStatus() { return failed > 0 ? "FAILED" : "SUCCESS"; }
-    public boolean isSuccess()       { return failed == 0; }
+    public String getOverallStatus() {
+        if (notExecuted) return "NOT_EXECUTED";
+        return (failed > 0 || valFail > 0) ? "FAILED" : "SUCCESS";
+    }
+    public boolean isSuccess() { return !notExecuted && failed == 0 && valFail == 0; }
 
     /** Compute stats from a NodeExecutionData. */
     public static ExecutionStats from(NodeExecutionData node) {
+        if (node.isNotExecuted()) {
+            return new ExecutionStats(0, 0, 0, 0, 0, 0, 0, 0, true);
+        }
         int total = 0, success = 0, failed = 0;
         int valEnabled = 0, valPass = 0, valFail = 0, valWarn = 0, infoOnly = 0;
 
@@ -58,6 +67,6 @@ public class ExecutionStats {
                 default: break;
             }
         }
-        return new ExecutionStats(total, success, failed, valEnabled, valPass, valFail, valWarn, infoOnly);
+        return new ExecutionStats(total, success, failed, valEnabled, valPass, valFail, valWarn, infoOnly, false);
     }
 }

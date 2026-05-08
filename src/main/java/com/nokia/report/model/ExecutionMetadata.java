@@ -35,6 +35,10 @@ public class ExecutionMetadata {
     public ExecutionSummary getExecutionSummary() { return executionSummary; }
     public void setExecutionSummary(ExecutionSummary executionSummary) { this.executionSummary = executionSummary; }
 
+    public String getOverallStatus() {
+        return executionSummary != null ? executionSummary.getOverallStatus() : null;
+    }
+
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ExecutionSummary {
 
@@ -44,10 +48,16 @@ public class ExecutionMetadata {
         @JsonProperty("endDateAndTime")
         private String endDateAndTime;
 
+        @JsonProperty("overall_status")
+        private String overallStatus;
+
         public String getStartDateAndTime() { return startDateAndTime; }
         public void setStartDateAndTime(String startDateAndTime) { this.startDateAndTime = startDateAndTime; }
 
         public String getEndDateAndTime() { return endDateAndTime; }
         public void setEndDateAndTime(String endDateAndTime) { this.endDateAndTime = endDateAndTime; }
+
+        public String getOverallStatus() { return overallStatus; }
+        public void setOverallStatus(String overallStatus) { this.overallStatus = overallStatus; }
     }
 }
