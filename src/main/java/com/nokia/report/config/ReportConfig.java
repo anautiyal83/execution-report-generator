@@ -55,6 +55,7 @@ public class ReportConfig {
     private String timestamp;
     private String summaryHtmlName;     // filename for summary report
     private boolean generateSummary = true; // false = skip writing summary HTML
+    private boolean rollbackSummary = false; // true = label report as "Rollback Summary Report"
 
     // -------------------------------------------------------------------------
     // Getters
@@ -74,6 +75,7 @@ public class ReportConfig {
     public String getTimestamp()           { return timestamp; }
     public String getSummaryHtmlName()     { return summaryHtmlName; }
     public boolean isGenerateSummary()     { return generateSummary; }
+    public boolean isRollbackSummary()     { return rollbackSummary; }
 
     /** Convenience: full detail report path = outputHtmlPath + separator + outputHtmlName */
     public String getOutputHtml() {
@@ -103,6 +105,7 @@ public class ReportConfig {
     public void setTimestamp(String timestamp)                     { this.timestamp = timestamp; }
     public void setSummaryHtmlName(String summaryHtmlName)         { this.summaryHtmlName = summaryHtmlName; }
     public void setGenerateSummary(boolean generateSummary)        { this.generateSummary = generateSummary; }
+    public void setRollbackSummary(boolean rollbackSummary)        { this.rollbackSummary = rollbackSummary; }
 
     // -------------------------------------------------------------------------
     // Validation
@@ -292,6 +295,12 @@ public class ReportConfig {
          */
         public Builder generateSummary(boolean generateSummary) {
             config.generateSummary = generateSummary;
+            return this;
+        }
+
+        /** When {@code true}, labels the summary report as "Rollback Summary Report". Defaults to {@code false}. */
+        public Builder rollbackSummary(boolean rollbackSummary) {
+            config.rollbackSummary = rollbackSummary;
             return this;
         }
 

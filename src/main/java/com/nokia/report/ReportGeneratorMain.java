@@ -80,6 +80,7 @@ public class ReportGeneratorMain {
                 case "--output-html-name":    config.setOutputHtmlName(args[++i]);      break;
                 case "--output-summary-name": config.setSummaryHtmlName(args[++i]);     break;
                 case "--generate-summary":    config.setGenerateSummary(!"false".equalsIgnoreCase(args[++i])); break;
+                case "--rollback-summary":    config.setRollbackSummary("true".equalsIgnoreCase(args[++i]));  break;
                 case "--template":            config.setTemplatePath(args[++i]);        break;
                 case "--summary-template":    config.setSummaryTemplatePath(args[++i]); break;
                 case "--request-id":          config.setRequestId(args[++i]);           break;

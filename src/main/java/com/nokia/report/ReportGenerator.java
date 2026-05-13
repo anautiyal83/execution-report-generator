@@ -109,6 +109,7 @@ public class ReportGenerator {
             summaryValues.put("PAGE_TITLE",             nodeTypeSafe + " " + activitySafe + " \u2014 MOP Summary Report");
             summaryValues.put("REPORT_HEADER",          nodeTypeSafe + " \u2014 " + activitySafe);
             summaryValues.put("CR_GROUP_SUBTITLE",      "CR Group: " + crGroupSafe);
+            summaryValues.put("REPORT_SUBHEADER",       config.isRollbackSummary() ? "Rollback Summary Report" : "Execution Summary Report");
             summaryValues.put("META_GENERATED_ON",      timestamp);
             summaryValues.put("META_REQUEST_ID",        requestId);
             summaryValues.put("META_NODE_TYPE",         nodeTypeSafe);
