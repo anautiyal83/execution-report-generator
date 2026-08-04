@@ -39,6 +39,9 @@ public class CommandResultDetail {
     @JsonProperty("success")
     private boolean success;
 
+    @JsonProperty("warning")
+    private boolean warning;
+
     @JsonProperty("reason")
     private String reason;
 
@@ -71,6 +74,7 @@ public class CommandResultDetail {
     public String getCommand()                { return command; }
     public String getDescription()            { return description; }
     public boolean isSuccess()                { return success; }
+    public boolean isWarning()                { return warning; }
     public String getReason()                 { return reason; }
     public String getFailure()                { return failure; }
     public boolean isValidate()               { return validate; }

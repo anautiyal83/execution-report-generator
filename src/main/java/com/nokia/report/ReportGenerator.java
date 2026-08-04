@@ -87,8 +87,8 @@ public class ReportGenerator {
             if (s.isNotExecuted()) notExecutedNodes.add(n);
             else if (!s.isSuccess()) failedNodes.add(n);
         }
-        int passed      = total - failedNodes.size() - notExecutedNodes.size();
-        int failed      = failedNodes.size();
+        int passed = total - failedNodes.size() - notExecutedNodes.size();
+        int failed = failedNodes.size();
 
         // 3. Shared metadata values
         String nodeTypeSafe  = HtmlFragmentBuilder.esc(config.getNodeType());

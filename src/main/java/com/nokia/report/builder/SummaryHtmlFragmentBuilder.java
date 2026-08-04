@@ -67,7 +67,9 @@ public class SummaryHtmlFragmentBuilder {
               .append("<td class=\"cell-success\">").append(ps.getSuccess()).append("</td>")
               .append("<td class=\"cell-failed\">").append(ps.getFailed()).append("</td>")
               .append("<td><span class=\"badge ").append(ok ? "badge-success" : "badge-error").append("\">")
-              .append(ok ? "PASSED" : "FAILED").append("</span></td>")
+              .append(ok ? "PASSED" : "FAILED").append("</span>")
+              .append(buildWarnInfo(ps.getWarning()))
+              .append("</td>")
               .append("</tr>");
         }
         return sb.toString();
@@ -80,10 +82,10 @@ public class SummaryHtmlFragmentBuilder {
 
         for (NodeExecutionData node : nodes) {
             ExecutionStats s = ExecutionStats.from(node);
-            boolean nodeOk       = s.isSuccess();
-            boolean notExecuted  = s.isNotExecuted();
-            String rowCls        = notExecuted ? "row-not-executed" : (nodeOk ? "" : "row-failed");
-            String overallBadge  = notExecuted ? "badge-warning" : (nodeOk ? "badge-success" : "badge-error");
+            boolean nodeOk      = s.isSuccess();
+            boolean notExecuted = s.isNotExecuted();
+            String rowCls       = notExecuted ? "row-not-executed" : (nodeOk ? "" : "row-failed");
+            String overallBadge = notExecuted ? "badge-warning" : (nodeOk ? "badge-success" : "badge-error");
 
             // Build phase → stats map for quick lookup
             Map<String, PhaseStats> phaseMap = new LinkedHashMap<>();
@@ -112,7 +114,9 @@ public class SummaryHtmlFragmentBuilder {
                           .append(phaseOk ? "badge-success" : "badge-error")
                           .append("\">")
                           .append(phaseOk ? "PASSED" : "FAILED")
-                          .append("</span></td>");
+                          .append("</span>")
+                          .append(buildWarnInfo(ps.getWarning()))
+                          .append("</td>");
                     }
                 }
             }
@@ -142,6 +146,16 @@ public class SummaryHtmlFragmentBuilder {
     // -------------------------------------------------------------------------
     // Internal
     // -------------------------------------------------------------------------
+
+    /**
+     * Returns a small inline warning indicator when {@code warnCount > 0}, empty string otherwise.
+     * Rendered as a superscript-style span so it sits neatly after a PASSED badge.
+     */
+    private static String buildWarnInfo(int warnCount) {
+        if (warnCount == 0) return "";
+        return "<span class=\"badge badge-warning\">&#9888; " + warnCount
+                + (warnCount == 1 ? " warning" : " warnings") + "</span>";
+    }
 
     /** Collect phases that appear in at least one node's data, sorted by PHASE_ORDER.
      *  Phases absent from all nodes are excluded entirely. */

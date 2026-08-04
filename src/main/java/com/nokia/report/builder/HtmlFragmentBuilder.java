@@ -155,7 +155,7 @@ public class HtmlFragmentBuilder {
         for (String phase : sortedPhases) {
             boolean phaseFailed = byPhase.get(phase).stream().anyMatch(e -> {
                 CommandResultDetail d = e.getValue();
-                return !d.isSuccess() || "FAILED".equalsIgnoreCase(d.getValidationStatus());
+                return (!d.isSuccess() && !d.isWarning()) || "FAILED".equalsIgnoreCase(d.getValidationStatus());
             });
             sb.append(phaseHeaderTemplate
                     .replace("{{PH_PHASE}}", esc(phase))
@@ -169,11 +169,12 @@ public class HtmlFragmentBuilder {
     }
 
     private String buildCommandRow(String phase, String cmd, CommandResultDetail d) {
-        String key      = "r" + rowCounter++;
-        boolean success = d.isSuccess();
-        String target   = d.getTarget() != null ? d.getTarget().trim() : "";
-        String desc     = orNA(d.getDescription());
-        String failReason = success ? "#N/A" : buildFailReason(d.getReason(), d.getFailure());
+        String key         = "r" + rowCounter++;
+        boolean success    = d.isSuccess();
+        boolean execWarn   = !success && d.isWarning();
+        String target      = d.getTarget() != null ? d.getTarget().trim() : "";
+        String desc        = orNA(d.getDescription());
+        String failReason  = (success || execWarn) ? "#N/A" : buildFailReason(d.getReason(), d.getFailure());
 
         boolean validate  = d.isValidate();
         String valStatus  = d.getValidationStatus() != null ? d.getValidationStatus().trim() : "SKIPPED";
@@ -203,13 +204,13 @@ public class HtmlFragmentBuilder {
 
         return commandRowTemplate
             .replace("{{CR_PHASE}}",          esc(phase))
-            .replace("{{CR_IS_FAILED}}",      success ? "0" : "1")
+            .replace("{{CR_IS_FAILED}}",      success ? "0" : (execWarn ? "0" : "1"))
             .replace("{{CR_KEY}}",            key)
             .replace("{{CR_CMD}}",            esc(cmd))
             .replace("{{CR_DESC}}",           esc(desc))
             .replace("{{CR_TARGET}}",         esc(target))
-            .replace("{{CR_EXEC_BADGE}}",     success ? "badge-success" : "badge-error")
-            .replace("{{CR_EXEC_LABEL}}",     success ? "Success" : "Failed")
+            .replace("{{CR_EXEC_BADGE}}",     success ? "badge-success" : (execWarn ? "badge-warning" : "badge-error"))
+            .replace("{{CR_EXEC_LABEL}}",     success ? "Success" : (execWarn ? "Warning" : "Failed"))
             .replace("{{CR_FAIL_REASON}}",    esc(failReason))
             .replace("{{CR_VALIDATE_BADGE}}", validate ? "badge-enabled" : "badge-disabled")
             .replace("{{CR_VALIDATE_LABEL}}", validate ? "True" : "False")

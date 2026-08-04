@@ -40,8 +40,9 @@ public class ExecutionStats {
     public boolean isNotExecuted(){ return notExecuted; }
 
     public String getOverallStatus() {
-        if (notExecuted) return "NOT_EXECUTED";
-        return (failed > 0 || valFail > 0) ? "FAILED" : "SUCCESS";
+        if (notExecuted)               return "NOT_EXECUTED";
+        if (failed > 0 || valFail > 0) return "FAILED";
+        return "SUCCESS";
     }
     public boolean isSuccess() { return !notExecuted && failed == 0 && valFail == 0; }
 
@@ -55,7 +56,9 @@ public class ExecutionStats {
 
         for (CommandResultDetail d : node.getCommands().values()) {
             total++;
-            if (d.isSuccess()) success++; else failed++;
+            if (d.isSuccess())              success++;
+            else if (d.isWarning())         valWarn++;   // execution-level warning: not a failure
+            else                            failed++;
             if (d.isValidate()) valEnabled++;
 
             String vs = d.getValidationStatus() == null ? "" : d.getValidationStatus().trim().toLowerCase();
