@@ -39,6 +39,9 @@ public class CommandResultDetail {
     @JsonProperty("success")
     private boolean success;
 
+    @JsonProperty("warning")
+    private boolean warning;
+
     @JsonProperty("reason")
     private String reason;
 
@@ -60,11 +63,18 @@ public class CommandResultDetail {
     @JsonProperty("output")
     private String output;
 
+    @JsonProperty("startDateAndTime")
+    private String startDateAndTime;
+
+    @JsonProperty("endDateAndTime")
+    private String endDateAndTime;
+
     public String getPhase()                  { return phase; }
     public String getTarget()                 { return target; }
     public String getCommand()                { return command; }
     public String getDescription()            { return description; }
     public boolean isSuccess()                { return success; }
+    public boolean isWarning()                { return warning; }
     public String getReason()                 { return reason; }
     public String getFailure()                { return failure; }
     public boolean isValidate()               { return validate; }
@@ -72,4 +82,6 @@ public class CommandResultDetail {
     public String getValidationStatus()       { return validationStatus; }
     public String getValidationConclusion()   { return validationConclusion; }
     public String getOutput()                 { return output; }
+    public String getStartDateAndTime()       { return startDateAndTime; }
+    public String getEndDateAndTime()         { return endDateAndTime; }
 }

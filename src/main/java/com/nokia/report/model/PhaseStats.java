@@ -27,19 +27,23 @@ public class PhaseStats {
     private final int total;
     private final int success;
     private final int failed;
+    private final int warning;
 
-    public PhaseStats(String phase, int total, int success, int failed) {
+    public PhaseStats(String phase, int total, int success, int failed, int warning) {
         this.phase   = phase;
         this.total   = total;
         this.success = success;
         this.failed  = failed;
+        this.warning = warning;
     }
 
     public String  getPhase()   { return phase; }
     public int     getTotal()   { return total; }
     public int     getSuccess() { return success; }
     public int     getFailed()  { return failed; }
+    public int     getWarning() { return warning; }
     public boolean isSuccess()  { return failed == 0; }
+    public boolean isWarning()  { return failed == 0 && warning > 0; }
 
     /**
      * Compute per-phase stats from a node, sorted by the standard phase order.
@@ -50,10 +54,14 @@ public class PhaseStats {
         for (CommandResultDetail d : node.getCommands().values()) {
             String ph = d.getPhase();
             ph = (ph != null && !ph.trim().isEmpty()) ? ph.trim() : "OTHER";
-            if (!byPhase.containsKey(ph)) byPhase.put(ph, new int[3]);
+            if (!byPhase.containsKey(ph)) byPhase.put(ph, new int[4]); // [total, success, failed, warning]
             int[] s = byPhase.get(ph);
             s[0]++;
-            if (d.isSuccess()) s[1]++; else s[2]++;
+            boolean commandFailed  = (!d.isSuccess() && !d.isWarning()) || "FAILED".equalsIgnoreCase(d.getValidationStatus());
+            boolean commandWarning = !commandFailed && (d.isWarning() || "WARNING".equalsIgnoreCase(d.getValidationStatus()));
+            if (commandFailed)       s[2]++;
+            else if (commandWarning) s[3]++;
+            else                     s[1]++;
         }
 
         List<String> sorted = new ArrayList<>();
@@ -63,7 +71,7 @@ public class PhaseStats {
         List<PhaseStats> result = new ArrayList<>();
         for (String p : sorted) {
             int[] s = byPhase.get(p);
-            result.add(new PhaseStats(p, s[0], s[1], s[2]));
+            result.add(new PhaseStats(p, s[0], s[1], s[2], s[3]));
         }
         return result;
     }

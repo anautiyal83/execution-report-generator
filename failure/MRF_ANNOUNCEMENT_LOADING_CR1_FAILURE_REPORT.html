@@ -83,6 +83,16 @@
     .card-subtitle { font-size: 10px; opacity: .70; margin-top: 2px; }
     .card-counter  { font-size: 30px; font-weight: 700; line-height: 1; margin-top: 6px; }
 
+    /* ── Activity timing bar ─────────────────────────────────────────────── */
+    .node-timing-bar {
+      display: flex; flex-wrap: wrap; gap: 6px 20px;
+      background: #e8f0fe; border-radius: 6px; padding: 7px 12px;
+      margin-bottom: 10px; font-size: 11px;
+    }
+    .timing-item { display: flex; gap: 4px; align-items: center; }
+    .timing-label { color: #1a3a5c; font-weight: 600; }
+    .timing-duration { font-weight: 600; color: #1e7e45; }
+
     /* ── Command table ───────────────────────────────────────────────────── */
     .table { width: 100%; border-collapse: collapse; font-size: 11px; }
     .table th { padding: 6px 8px; text-align: left; font-weight: 600; white-space: nowrap; background: #1a3a5c; color: #fff; }
@@ -134,7 +144,7 @@
   </div>
 
   <div class="meta-bar">
-    <div class="meta-item"><span class="meta-label">Generated On:</span> <span>2026-04-30 11:28:48</span></div>
+    <div class="meta-item"><span class="meta-label">Generated On:</span> <span>2026-05-08 12:04:26</span></div>
     <div class="meta-item"><span class="meta-label">Request ID:</span> <span>CR-12345</span></div>
     <div class="meta-item"><span class="meta-label">Node Type:</span> <span>MRF</span></div>
     <div class="meta-item"><span class="meta-label">Activity:</span> <span>ANNOUNCEMENT_LOADING</span></div>
@@ -154,7 +164,7 @@
             <th>Failed</th>
             <th>Status</th>
           </tr></thead>
-          <tbody><tr class=""><td>PRE_NODE_HEALTH_CHECK</td><td>3</td><td class="cell-success">3</td><td class="cell-failed">0</td><td><span class="badge badge-success">PASSED</span></td></tr><tr class=""><td>BACKUP</td><td>5</td><td class="cell-success">5</td><td class="cell-failed">0</td><td><span class="badge badge-success">PASSED</span></td></tr><tr class="phase-failed"><td>ACTIVITY_CONFIGURATION</td><td>5</td><td class="cell-success">4</td><td class="cell-failed">1</td><td><span class="badge badge-error">FAILED</span></td></tr><tr class=""><td>ROLLBACK_CONFIGURATION</td><td>5</td><td class="cell-success">5</td><td class="cell-failed">0</td><td><span class="badge badge-success">PASSED</span></td></tr><tr class=""><td>ROLLBACK_POSTCHECK</td><td>1</td><td class="cell-success">1</td><td class="cell-failed">0</td><td><span class="badge badge-success">PASSED</span></td></tr><tr class=""><td>POST_NODE_HEALTH_CHECK</td><td>1</td><td class="cell-success">1</td><td class="cell-failed">0</td><td><span class="badge badge-success">PASSED</span></td></tr></tbody>
+          <tbody><tr class=""><td>PRE_NODE_HEALTH_CHECK</td><td>3</td><td class="cell-success">3</td><td class="cell-failed">0</td><td><span class="badge badge-success">PASSED</span></td></tr><tr class=""><td>BACKUP</td><td>5</td><td class="cell-success">5</td><td class="cell-failed">0</td><td><span class="badge badge-success">PASSED</span></td></tr><tr class=""><td>ACTIVITY_CONFIGURATION</td><td>5</td><td class="cell-success">5</td><td class="cell-failed">0</td><td><span class="badge badge-success">PASSED</span></td></tr><tr class="phase-failed"><td>ACTIVITY_POSTCHECK</td><td>1</td><td class="cell-success">0</td><td class="cell-failed">1</td><td><span class="badge badge-error">FAILED</span></td></tr><tr class="phase-failed"><td>ROLLBACK_CONFIGURATION</td><td>3</td><td class="cell-success">2</td><td class="cell-failed">1</td><td><span class="badge badge-error">FAILED</span></td></tr><tr class=""><td>POST_NODE_HEALTH_CHECK</td><td>1</td><td class="cell-success">1</td><td class="cell-failed">0</td><td><span class="badge badge-success">PASSED</span></td></tr></tbody>
         </table>
       </div>
     </div>
@@ -167,36 +177,42 @@
     <span class="node-name">MRF4</span>
     <span class="badge badge-error">FAILED</span>
     <div class="node-panel-stats-inline">
-      <span>Cmds: 20</span>
-      <span class="inline-success">&#10004; 19</span>
-      <span class="inline-failed">&#10006; 1</span>
+      <span>Cmds: 18</span>
+      <span class="inline-success">&#10004; 18</span>
+      <span class="inline-failed">&#10006; 0</span>
     </div>
     <button class="node-toggle-btn" id="node-toggle-MRF4">&#9654;</button>
   </div>
   <div class="node-panel-body" id="node-body-MRF4">
     <div class="node-summary-cards">
       <div class="card-row">
-        <div class="card card--default"><div class="card-title">Total Commands</div><div class="card-subtitle">&#9730; Executed</div><div class="card-counter">20</div></div>
-        <div class="card card--success"><div class="card-title">Succeeded</div><div class="card-subtitle">&#10004; OK</div><div class="card-counter">19</div></div>
-        <div class="card card--failed"><div class="card-title">Failed</div><div class="card-subtitle">&#10006; Errors</div><div class="card-counter">1</div></div>
+        <div class="card card--default"><div class="card-title">Total Commands</div><div class="card-subtitle">&#9730; Executed</div><div class="card-counter">18</div></div>
+        <div class="card card--success"><div class="card-title">Succeeded</div><div class="card-subtitle">&#10004; OK</div><div class="card-counter">18</div></div>
+        <div class="card card--failed"><div class="card-title">Failed</div><div class="card-subtitle">&#10006; Errors</div><div class="card-counter">0</div></div>
       </div>
       <div class="card-row">
-        <div class="card card--default"><div class="card-title">Validations</div><div class="card-subtitle">&#9745; Configured</div><div class="card-counter">13</div></div>
-        <div class="card card--success"><div class="card-title">Val. Pass</div><div class="card-subtitle">&#10004; Checks OK</div><div class="card-counter">12</div></div>
-        <div class="card card--failed"><div class="card-title">Val. Failed</div><div class="card-subtitle">&#10006; Critical</div><div class="card-counter">1</div></div>
+        <div class="card card--default"><div class="card-title">Validations</div><div class="card-subtitle">&#9745; Configured</div><div class="card-counter">11</div></div>
+        <div class="card card--success"><div class="card-title">Val. Pass</div><div class="card-subtitle">&#10004; Checks OK</div><div class="card-counter">9</div></div>
+        <div class="card card--failed"><div class="card-title">Val. Failed</div><div class="card-subtitle">&#10006; Critical</div><div class="card-counter">2</div></div>
         <div class="card card--warning"><div class="card-title">Warnings</div><div class="card-subtitle">&#9888; Attention</div><div class="card-counter">0</div></div>
         <div class="card card--info"><div class="card-title">Info Only</div><div class="card-subtitle">&#9432; No Validation</div><div class="card-counter">7</div></div>
       </div>
+    </div>
+    <div class="node-timing-bar">
+      <span class="timing-item"><span class="timing-label">Activity Start:</span> 2026-05-07 15:21:02</span>
+      <span class="timing-item"><span class="timing-label">Activity End:</span> 2026-05-07 15:21:56</span>
+      <span class="timing-item timing-duration"><span class="timing-label">Total Duration:</span> 54s</span>
     </div>
     <div class="table-container">
       <table class="table" id="table-MRF4">
         <thead><tr>
           <th class="col-command">Command</th><th>Description</th><th>Target Node</th>
           <th>Exec Status</th><th>Fail Reason</th><th>Validate</th>
-          <th>Val Criteria</th><th>Val Status</th><th>Val Conclusion</th><th>Output</th>
+          <th>Val Criteria</th><th>Val Status</th><th>Val Conclusion</th>
+          <th>Start Time</th><th>End Time</th><th>Duration</th><th>Output</th>
         </tr></thead>
         <tbody><tr class="phase-header-row" onclick="togglePhase(this)">
-  <td colspan="10"><span class="phase-toggle-icon">&#9660;</span> PRE_NODE_HEALTH_CHECK</td>
+  <td colspan="13"><span class="phase-toggle-icon">&#9660;</span> PRE_NODE_HEALTH_CHECK <span class="badge badge-success">PASSED</span></td>
 </tr><tr class="row-data" data-phase="PRE_NODE_HEALTH_CHECK" data-failed="0" data-key="r0">
   <td><code class="command-code">date</code></td>
   <td>Show current date</td>
@@ -207,6 +223,9 @@
   <td>Informational only; no validation required.</td>
   <td><span class="badge badge-success">skipped</span></td>
   <td><span class="na-text">Validation not required</span></td>
+  <td>2026-05-07 15:21:02</td>
+  <td>2026-05-07 15:21:06</td>
+  <td>4s</td>
   <td><button class="output-toggle" onclick="loadOutput(this,'r0')">View Output</button><div class="output-content"></div></td>
 </tr><tr class="row-data" data-phase="PRE_NODE_HEALTH_CHECK" data-failed="0" data-key="r1">
   <td><code class="command-code">time</code></td>
@@ -218,6 +237,9 @@
   <td>Informational only; no validation required.</td>
   <td><span class="badge badge-success">skipped</span></td>
   <td><span class="na-text">Validation not required</span></td>
+  <td>2026-05-07 15:21:06</td>
+  <td>2026-05-07 15:21:06</td>
+  <td>0s</td>
   <td><button class="output-toggle" onclick="loadOutput(this,'r1')">View Output</button><div class="output-content"></div></td>
 </tr><tr class="row-data" data-phase="PRE_NODE_HEALTH_CHECK" data-failed="0" data-key="r2">
   <td><code class="command-code">systemctl status swms --no-pager</code></td>
@@ -229,11 +251,14 @@
   <td>Verify SWMS service is active before activity execution</td>
   <td><span class="badge badge-success">success</span></td>
   <td><span class="na-text">Pre-health check PASSED: MRF4 - SWMS service is active</span></td>
+  <td>2026-05-07 15:21:06</td>
+  <td>2026-05-07 15:21:07</td>
+  <td>1s</td>
   <td><button class="output-toggle" onclick="loadOutput(this,'r2')">View Output</button><div class="output-content"></div></td>
 </tr><tr class="phase-header-row" onclick="togglePhase(this)">
-  <td colspan="10"><span class="phase-toggle-icon">&#9660;</span> BACKUP</td>
+  <td colspan="13"><span class="phase-toggle-icon">&#9660;</span> BACKUP <span class="badge badge-success">PASSED</span></td>
 </tr><tr class="row-data" data-phase="BACKUP" data-failed="0" data-key="r3">
-  <td><code class="command-code">ls -lrt /mnt/shared_data/38233 | grep &quot;DOC_VERIFICATION_PROMPT_5003_AMRWB_Mode6.3gp&quot;</code></td>
+  <td><code class="command-code">ls -lrt /mnt/shared_data/38767 | grep &quot;DOC_VERIFICATION_PROMPT_7999_AMRWB_Mode1.3gp&quot;</code></td>
   <td>List the specific announcement files</td>
   <td>local</td>
   <td><span class="badge badge-success">Success</span></td>
@@ -242,6 +267,9 @@
   <td>Verify the specific announcement files existence on OM Server</td>
   <td><span class="badge badge-success">success</span></td>
   <td><span class="na-text">Specific announcement files exists</span></td>
+  <td>2026-05-07 15:21:07</td>
+  <td>2026-05-07 15:21:07</td>
+  <td>0s</td>
   <td><button class="output-toggle" onclick="loadOutput(this,'r3')">View Output</button><div class="output-content"></div></td>
 </tr><tr class="row-data" data-phase="BACKUP" data-failed="0" data-key="r4">
   <td><code class="command-code">cd /var/opt/swms/clips/persistent/provisioned/audioclips/RAJ/PREPAID</code></td>
@@ -253,9 +281,12 @@
   <td>Informational only; no validation required.</td>
   <td><span class="badge badge-success">skipped</span></td>
   <td><span class="na-text">Validation not required</span></td>
+  <td>2026-05-07 15:21:08</td>
+  <td>2026-05-07 15:21:08</td>
+  <td>0s</td>
   <td><button class="output-toggle" onclick="loadOutput(this,'r4')">View Output</button><div class="output-content"></div></td>
 </tr><tr class="row-data" data-phase="BACKUP" data-failed="0" data-key="r5">
-  <td><code class="command-code">ls -lrt | grep &quot;DOC_VERIFICATION_PROMPT_5003_AMRWB_Mode6.3gp&quot; | awk '{print $NF}' | paste -sd ' ' -
+  <td><code class="command-code">ls -lrt | grep &quot;DOC_VERIFICATION_PROMPT_7999_AMRWB_Mode1.3gp&quot; | awk '{print $NF}' | paste -sd ' ' -
 </code></td>
   <td>List the file which exists on destination directory of MRF Node</td>
   <td>niam_mrf_server</td>
@@ -265,9 +296,12 @@
   <td>Verify files exist for Backup</td>
   <td><span class="badge badge-success">success</span></td>
   <td><span class="na-text">files exist for Backup on MRF Node</span></td>
+  <td>2026-05-07 15:21:08</td>
+  <td>2026-05-07 15:21:12</td>
+  <td>4s</td>
   <td><button class="output-toggle" onclick="loadOutput(this,'r5')">View Output</button><div class="output-content"></div></td>
 </tr><tr class="row-data" data-phase="BACKUP" data-failed="0" data-key="r6">
-  <td><code class="command-code">ssh -F /dev/null -o MACs=hmac-sha2-256 -o HostKeyAlgorithms=ecdsa-sha2-nistp256,ssh-rsa root@2401:4900:24:250b::3 &quot;mkdir -p /tmp/CR-12345678/MRF4/$(echo '/var/opt/swms/clips/persistent/provisioned/audioclips/RAJ/PREPAID' | sed 's#^/##; s#/#_#g')&quot;
+  <td><code class="command-code">ssh -F /dev/null -o MACs=hmac-sha2-256 -o HostKeyAlgorithms=ecdsa-sha2-nistp256,ssh-rsa root@2401:4900:24:250b::3 &quot;mkdir -p /tmp/CR-18181818/MRF4/$(echo '/var/opt/swms/clips/persistent/provisioned/audioclips/RAJ/PREPAID' | sed 's#^/##; s#/#_#g')&quot;
 </code></td>
   <td>Create Backup directory on Repo Server</td>
   <td>niam_mrf_server</td>
@@ -277,9 +311,12 @@
   <td>Informational only; no validation required.</td>
   <td><span class="badge badge-success">skipped</span></td>
   <td><span class="na-text">Validation not required</span></td>
+  <td>2026-05-07 15:21:12</td>
+  <td>2026-05-07 15:21:18</td>
+  <td>6s</td>
   <td><button class="output-toggle" onclick="loadOutput(this,'r6')">View Output</button><div class="output-content"></div></td>
 </tr><tr class="row-data" data-phase="BACKUP" data-failed="0" data-key="r7">
-  <td><code class="command-code">scp -F /dev/null -o MACs=hmac-sha2-256 -o HostKeyAlgorithms=ecdsa-sha2-nistp256,ssh-rsa DOC_VERIFICATION_PROMPT_5003_AMRWB_Mode6.3gp root@[2401:4900:24:250b::3]:/tmp/CR-12345678/MRF4/$(echo '/var/opt/swms/clips/persistent/provisioned/audioclips/RAJ/PREPAID' | sed 's#^/##; s#/#_#g')/.</code></td>
+  <td><code class="command-code">scp -F /dev/null -o MACs=hmac-sha2-256 -o HostKeyAlgorithms=ecdsa-sha2-nistp256,ssh-rsa DOC_VERIFICATION_PROMPT_7999_AMRWB_Mode1.3gp root@[2401:4900:24:250b::3]:/tmp/CR-18181818/MRF4/$(echo '/var/opt/swms/clips/persistent/provisioned/audioclips/RAJ/PREPAID' | sed 's#^/##; s#/#_#g')/.</code></td>
   <td>Create a backup of all matching files on the Repo server in tmp directory</td>
   <td>niam_mrf_server</td>
   <td><span class="badge badge-success">Success</span></td>
@@ -288,11 +325,14 @@
   <td>Informational only; no validation required.</td>
   <td><span class="badge badge-success">skipped</span></td>
   <td><span class="na-text">Validation not required</span></td>
+  <td>2026-05-07 15:21:18</td>
+  <td>2026-05-07 15:21:23</td>
+  <td>5s</td>
   <td><button class="output-toggle" onclick="loadOutput(this,'r7')">View Output</button><div class="output-content"></div></td>
 </tr><tr class="phase-header-row" onclick="togglePhase(this)">
-  <td colspan="10"><span class="phase-toggle-icon">&#9660;</span> ACTIVITY_CONFIGURATION</td>
+  <td colspan="13"><span class="phase-toggle-icon">&#9660;</span> ACTIVITY_CONFIGURATION <span class="badge badge-success">PASSED</span></td>
 </tr><tr class="row-data" data-phase="ACTIVITY_CONFIGURATION" data-failed="0" data-key="r8">
-  <td><code class="command-code">ssh -F /dev/null -o MACs=hmac-sha2-256 -o HostKeyAlgorithms=ecdsa-sha2-nistp256,ssh-rsa root@2401:4900:24:250b::3 &quot;mkdir -p /tmp/CR-12345678&quot;
+  <td><code class="command-code">ssh -F /dev/null -o MACs=hmac-sha2-256 -o HostKeyAlgorithms=ecdsa-sha2-nistp256,ssh-rsa root@2401:4900:24:250b::3 &quot;mkdir -p /tmp/CR-18181818&quot;
 </code></td>
   <td>Create directory on Repo Server</td>
   <td>niam_mrf_server</td>
@@ -302,9 +342,12 @@
   <td>Informational only; no validation required.</td>
   <td><span class="badge badge-success">skipped</span></td>
   <td><span class="na-text">Validation not required</span></td>
+  <td>2026-05-07 15:21:24</td>
+  <td>2026-05-07 15:21:30</td>
+  <td>6s</td>
   <td><button class="output-toggle" onclick="loadOutput(this,'r8')">View Output</button><div class="output-content"></div></td>
 </tr><tr class="row-data" data-phase="ACTIVITY_CONFIGURATION" data-failed="0" data-key="r9">
-  <td><code class="command-code">scp -F /dev/null -o StrictHostKeyChecking=no -o MACs=hmac-sha2-256 -o HostKeyAlgorithms=ecdsa-sha2-nistp256,ssh-rsa /mnt/shared_data/38233/DOC_VERIFICATION_PROMPT_5003_AMRWB_Mode6.3gp root@[2401:4900:24:250b::3]:/tmp/CR-12345678/.</code></td>
+  <td><code class="command-code">scp -F /dev/null -o StrictHostKeyChecking=no -o MACs=hmac-sha2-256 -o HostKeyAlgorithms=ecdsa-sha2-nistp256,ssh-rsa /mnt/shared_data/38767/DOC_VERIFICATION_PROMPT_7999_AMRWB_Mode1.3gp root@[2401:4900:24:250b::3]:/tmp/CR-18181818/.</code></td>
   <td>Copy the announcement files from OM server to repo server</td>
   <td>local</td>
   <td><span class="badge badge-success">Success</span></td>
@@ -313,9 +356,12 @@
   <td>Verify INPUT_FILE exists and uploaded successfully</td>
   <td><span class="badge badge-success">success</span></td>
   <td><span class="na-text">INPUT_FILE Upload successful</span></td>
+  <td>2026-05-07 15:21:30</td>
+  <td>2026-05-07 15:21:30</td>
+  <td>0s</td>
   <td><button class="output-toggle" onclick="loadOutput(this,'r9')">View Output</button><div class="output-content"></div></td>
 </tr><tr class="row-data" data-phase="ACTIVITY_CONFIGURATION" data-failed="0" data-key="r10">
-  <td><code class="command-code">scp -F /dev/null -o MACs=hmac-sha2-256 -o HostKeyAlgorithms=ecdsa-sha2-nistp256,ssh-rsa root@[2401:4900:24:250b::3]:/tmp/CR-12345678/DOC_VERIFICATION_PROMPT_5003_AMRWB_Mode6.3gp /tmp/.</code></td>
+  <td><code class="command-code">scp -F /dev/null -o MACs=hmac-sha2-256 -o HostKeyAlgorithms=ecdsa-sha2-nistp256,ssh-rsa root@[2401:4900:24:250b::3]:/tmp/CR-18181818/DOC_VERIFICATION_PROMPT_7999_AMRWB_Mode1.3gp /tmp/.</code></td>
   <td>Downloads announcement files from Repo server to MRF node tmp directory</td>
   <td>niam_mrf_server</td>
   <td><span class="badge badge-success">Success</span></td>
@@ -324,9 +370,12 @@
   <td>Verify INPUT_FILE exists and uploaded successfully</td>
   <td><span class="badge badge-success">success</span></td>
   <td><span class="na-text">INPUT_FILE Upload successful</span></td>
+  <td>2026-05-07 15:21:31</td>
+  <td>2026-05-07 15:21:36</td>
+  <td>5s</td>
   <td><button class="output-toggle" onclick="loadOutput(this,'r10')">View Output</button><div class="output-content"></div></td>
 </tr><tr class="row-data" data-phase="ACTIVITY_CONFIGURATION" data-failed="0" data-key="r11">
-  <td><code class="command-code">\cp -p /tmp/DOC_VERIFICATION_PROMPT_5003_AMRWB_Mode6.3gp /var/opt/swms/clips/persistent/provisioned/audioclips/RAJ/PREPAID</code></td>
+  <td><code class="command-code">\cp -p /tmp/DOC_VERIFICATION_PROMPT_7999_AMRWB_Mode1.3gp /var/opt/swms/clips/persistent/provisioned/audioclips/RAJ/PREPAID</code></td>
   <td>Copy the Announcement file into the destination directory on MRF Node</td>
   <td>niam_mrf_server</td>
   <td><span class="badge badge-success">Success</span></td>
@@ -335,21 +384,44 @@
   <td>Validation criteria evaluated by framework</td>
   <td><span class="badge badge-success">success</span></td>
   <td><span class="na-text">File copy successful</span></td>
+  <td>2026-05-07 15:21:36</td>
+  <td>2026-05-07 15:21:37</td>
+  <td>1s</td>
   <td><button class="output-toggle" onclick="loadOutput(this,'r11')">View Output</button><div class="output-content"></div></td>
-</tr><tr class="row-data" data-phase="ACTIVITY_CONFIGURATION" data-failed="1" data-key="r12">
-  <td><code class="command-code">chmod1 -R 777 /var/opt/swms/clips/persistent/provisioned/audioclips/RAJ/PREPAID</code></td>
+</tr><tr class="row-data" data-phase="ACTIVITY_CONFIGURATION" data-failed="0" data-key="r12">
+  <td><code class="command-code">chmod -R 722 /var/opt/swms/clips/persistent/provisioned/audioclips/RAJ/PREPAID</code></td>
   <td>Grants full permissions recursively to destination files on MRF Node</td>
   <td>niam_mrf_server</td>
-  <td><span class="badge badge-error">Failed</span></td>
-  <td><span class="na-text">chmod failed — FAILED</span></td>
+  <td><span class="badge badge-success">Success</span></td>
+  <td><span class="na-text">#N/A</span></td>
   <td><span class="badge badge-enabled">True</span></td>
   <td>Validation criteria evaluated by framework</td>
-  <td><span class="badge badge-error">failed</span></td>
-  <td><button class="output-toggle" onclick="loadValDetail(this,'r12')">View Details</button><div class="output-content"></div></td>
+  <td><span class="badge badge-success">success</span></td>
+  <td><span class="na-text">Permissions granted successfully</span></td>
+  <td>2026-05-07 15:21:37</td>
+  <td>2026-05-07 15:21:38</td>
+  <td>1s</td>
   <td><button class="output-toggle" onclick="loadOutput(this,'r12')">View Output</button><div class="output-content"></div></td>
 </tr><tr class="phase-header-row" onclick="togglePhase(this)">
-  <td colspan="10"><span class="phase-toggle-icon">&#9660;</span> ROLLBACK_CONFIGURATION</td>
-</tr><tr class="row-data" data-phase="ROLLBACK_CONFIGURATION" data-failed="0" data-key="r13">
+  <td colspan="13"><span class="phase-toggle-icon">&#9660;</span> ACTIVITY_POSTCHECK <span class="badge badge-error">FAILED</span></td>
+</tr><tr class="row-data" data-phase="ACTIVITY_POSTCHECK" data-failed="0" data-key="r13">
+  <td><code class="command-code">find /var/opt/swms/clips/persistent/provisioned/audioclips/RAJ/PREPAID/* -printf &quot;%M %p\n&quot; | grep -v &quot;^-rwxrwxrwx&quot;
+</code></td>
+  <td>Displays announcement files which are pushed and checks their Permission to be 777</td>
+  <td>niam_mrf_server</td>
+  <td><span class="badge badge-success">Success</span></td>
+  <td><span class="na-text">#N/A</span></td>
+  <td><span class="badge badge-enabled">True</span></td>
+  <td>Verify that new announcement files in destination folder have full permission</td>
+  <td><span class="badge badge-error">failed</span></td>
+  <td><button class="output-toggle" onclick="loadValDetail(this,'r13')">View Details</button><div class="output-content"></div></td>
+  <td>2026-05-07 15:21:38</td>
+  <td>2026-05-07 15:21:41</td>
+  <td>3s</td>
+  <td><button class="output-toggle" onclick="loadOutput(this,'r13')">View Output</button><div class="output-content"></div></td>
+</tr><tr class="phase-header-row" onclick="togglePhase(this)">
+  <td colspan="13"><span class="phase-toggle-icon">&#9660;</span> ROLLBACK_CONFIGURATION <span class="badge badge-error">FAILED</span></td>
+</tr><tr class="row-data" data-phase="ROLLBACK_CONFIGURATION" data-failed="0" data-key="r14">
   <td><code class="command-code">cd /var/opt/swms/clips/persistent/provisioned/audioclips/RAJ/PREPAID [2]</code></td>
   <td>Changes directory to the MRF Node destination path</td>
   <td>niam_mrf_server</td>
@@ -359,31 +431,26 @@
   <td>Informational only; no validation required.</td>
   <td><span class="badge badge-success">skipped</span></td>
   <td><span class="na-text">Validation not required</span></td>
-  <td><button class="output-toggle" onclick="loadOutput(this,'r13')">View Output</button><div class="output-content"></div></td>
-</tr><tr class="row-data" data-phase="ROLLBACK_CONFIGURATION" data-failed="0" data-key="r14">
-  <td><code class="command-code">ls -lrt | grep DOC_VERIFICATION_PROMPT_5003_AMRWB_Mode6.3gp | awk '{print $NF}' | paste -sd ' '</code></td>
+  <td>2026-05-07 15:21:41</td>
+  <td>2026-05-07 15:21:44</td>
+  <td>3s</td>
+  <td><button class="output-toggle" onclick="loadOutput(this,'r14')">View Output</button><div class="output-content"></div></td>
+</tr><tr class="row-data" data-phase="ROLLBACK_CONFIGURATION" data-failed="0" data-key="r15">
+  <td><code class="command-code">ls -lrt | grep DOC_VERIFICATION_PROMPT_7999_AMRWB_Mode1.3gp | awk '{print $NF}' | paste -sd ' '</code></td>
   <td>Changes directory to the MRF Node destination path</td>
   <td>niam_mrf_server</td>
   <td><span class="badge badge-success">Success</span></td>
   <td><span class="na-text">#N/A</span></td>
   <td><span class="badge badge-enabled">True</span></td>
   <td>Verify that new announcement files are present on Destination path of MRF node </td>
-  <td><span class="badge badge-success">success</span></td>
-  <td><span class="na-text">Announcement files are present on Destination path of MRF4</span></td>
-  <td><button class="output-toggle" onclick="loadOutput(this,'r14')">View Output</button><div class="output-content"></div></td>
-</tr><tr class="row-data" data-phase="ROLLBACK_CONFIGURATION" data-failed="0" data-key="r15">
-  <td><code class="command-code">rm -f DOC_VERIFICATION_PROMPT_5003_AMRWB_Mode6.3gp</code></td>
-  <td>Remove newly loaded announcement files before restoring backup</td>
-  <td>niam_mrf_server</td>
-  <td><span class="badge badge-success">Success</span></td>
-  <td><span class="na-text">#N/A</span></td>
-  <td><span class="badge badge-enabled">True</span></td>
-  <td>Verify announcement files removed successfully</td>
-  <td><span class="badge badge-success">success</span></td>
-  <td><span class="na-text">Announcement files removed successfully on MRF4</span></td>
+  <td><span class="badge badge-error">failed</span></td>
+  <td><button class="output-toggle" onclick="loadValDetail(this,'r15')">View Details</button><div class="output-content"></div></td>
+  <td>2026-05-07 15:21:44</td>
+  <td>2026-05-07 15:21:47</td>
+  <td>3s</td>
   <td><button class="output-toggle" onclick="loadOutput(this,'r15')">View Output</button><div class="output-content"></div></td>
 </tr><tr class="row-data" data-phase="ROLLBACK_CONFIGURATION" data-failed="0" data-key="r16">
-  <td><code class="command-code">ssh -F /dev/null -o MACs=hmac-sha2-256 -o HostKeyAlgorithms=ecdsa-sha2-nistp256,ssh-rsa root@2401:4900:24:250b::3 &quot;ls -lrt /tmp/CR-12345678/MRF4/$(echo '/var/opt/swms/clips/persistent/provisioned/audioclips/RAJ/PREPAID' | sed 's#^/##; s#/#_#g')&quot;
+  <td><code class="command-code">ssh -F /dev/null -o MACs=hmac-sha2-256 -o HostKeyAlgorithms=ecdsa-sha2-nistp256,ssh-rsa root@2401:4900:24:250b::3 &quot;ls -lrt /tmp/CR-18181818/MRF4/$(echo '/var/opt/swms/clips/persistent/provisioned/audioclips/RAJ/PREPAID' | sed 's#^/##; s#/#_#g')&quot;
 </code></td>
   <td>Create Backup directory on Repo Server</td>
   <td>niam_mrf_server</td>
@@ -393,34 +460,13 @@
   <td>Verify backup exists for specific announcement files for restoreg</td>
   <td><span class="badge badge-success">success</span></td>
   <td><span class="na-text">Backup files are present for restoration</span></td>
+  <td>2026-05-07 15:21:47</td>
+  <td>2026-05-07 15:21:54</td>
+  <td>7s</td>
   <td><button class="output-toggle" onclick="loadOutput(this,'r16')">View Output</button><div class="output-content"></div></td>
-</tr><tr class="row-data" data-phase="ROLLBACK_CONFIGURATION" data-failed="0" data-key="r17">
-  <td><code class="command-code">scp -F /dev/null -o MACs=hmac-sha2-256 -o HostKeyAlgorithms=ecdsa-sha2-nistp256,ssh-rsa root@[2401:4900:24:250b::3]:/tmp/CR-12345678/MRF4/$(echo '/var/opt/swms/clips/persistent/provisioned/audioclips/RAJ/PREPAID' | sed 's#^/##; s#/#_#g')/* .</code></td>
-  <td>Restore backup files from repo server to MRF node destination path</td>
-  <td>niam_mrf_server</td>
-  <td><span class="badge badge-success">Success</span></td>
-  <td><span class="na-text">#N/A</span></td>
-  <td><span class="badge badge-enabled">True</span></td>
-  <td>Verify INPUT_FILE exists and uploaded successfully</td>
-  <td><span class="badge badge-success">success</span></td>
-  <td><span class="na-text">INPUT_FILE Upload successful</span></td>
-  <td><button class="output-toggle" onclick="loadOutput(this,'r17')">View Output</button><div class="output-content"></div></td>
 </tr><tr class="phase-header-row" onclick="togglePhase(this)">
-  <td colspan="10"><span class="phase-toggle-icon">&#9660;</span> ROLLBACK_POSTCHECK</td>
-</tr><tr class="row-data" data-phase="ROLLBACK_POSTCHECK" data-failed="0" data-key="r18">
-  <td><code class="command-code">ls -ltrh /var/opt/swms/clips/persistent/provisioned/audioclips/RAJ/PREPAID</code></td>
-  <td>Display restored files at MRF Node destination path</td>
-  <td>niam_mrf_server</td>
-  <td><span class="badge badge-success">Success</span></td>
-  <td><span class="na-text">#N/A</span></td>
-  <td><span class="badge badge-enabled">True</span></td>
-  <td>Verify restored files are present at MRF Node destination path</td>
-  <td><span class="badge badge-success">success</span></td>
-  <td><span class="na-text">Rollback postcheck PASSED: Files verified at /var/opt/swms/clips/persistent/provisioned/audioclips/RAJ/PREPAID</span></td>
-  <td><button class="output-toggle" onclick="loadOutput(this,'r18')">View Output</button><div class="output-content"></div></td>
-</tr><tr class="phase-header-row" onclick="togglePhase(this)">
-  <td colspan="10"><span class="phase-toggle-icon">&#9660;</span> POST_NODE_HEALTH_CHECK</td>
-</tr><tr class="row-data" data-phase="POST_NODE_HEALTH_CHECK" data-failed="0" data-key="r19">
+  <td colspan="13"><span class="phase-toggle-icon">&#9660;</span> POST_NODE_HEALTH_CHECK <span class="badge badge-success">PASSED</span></td>
+</tr><tr class="row-data" data-phase="POST_NODE_HEALTH_CHECK" data-failed="0" data-key="r17">
   <td><code class="command-code">systemctl status swms --no-pager [2]</code></td>
   <td>Displays the SWMS service status</td>
   <td>niam_mrf_server</td>
@@ -430,7 +476,10 @@
   <td>Verify SWMS service is active after activity execution</td>
   <td><span class="badge badge-success">success</span></td>
   <td><span class="na-text">Post-health check PASSED: MRF4 - SWMS service is active</span></td>
-  <td><button class="output-toggle" onclick="loadOutput(this,'r19')">View Output</button><div class="output-content"></div></td>
+  <td>2026-05-07 15:21:54</td>
+  <td>2026-05-07 15:21:55</td>
+  <td>1s</td>
+  <td><button class="output-toggle" onclick="loadOutput(this,'r17')">View Output</button><div class="output-content"></div></td>
 </tr></tbody>
       </table>
     </div>
@@ -442,11 +491,11 @@
     <button class="btn btn-secondary" onclick="exportToXLSX()">&#128202; Export XLSX</button>
   </div>
 
-  <footer>Generated by Execution Report Generator &nbsp;|&nbsp; 2026-04-30 11:28:48 &nbsp;|&nbsp; MRF &mdash; ANNOUNCEMENT_LOADING</footer>
+  <footer>Generated by Execution Report Generator &nbsp;|&nbsp; 2026-05-08 12:04:26 &nbsp;|&nbsp; MRF &mdash; ANNOUNCEMENT_LOADING</footer>
 
 <script>
-  var RAW_OUTPUTS     = {"r0":"date; echo __CMD_DONE__:$?\r\nTue Apr 28 22:25:25 IST 2026\r\n__CMD_DONE__:0\r\n[root@dlmslabmr01 ~]# ","r1":"\r\n[root@dlmslabmr01 ~]# time; echo __CMD_DONE__:$?\r\n\r\nreal\t0m0.000s\r\nuser\t0m0.000s\r\nsys\t0m0.000s\r\n__CMD_DONE__:0\r\n[root@dlmslabmr01 ~]# ","r2":"\r\n[root@dlmslabmr01 ~]# systemctl status swms --no-pager; echo __CMD_DONE__:$?\r\n\u001b[0;1;32m●\u001b[0m swms.service - Starting swms radisys service\r\n   Loaded: loaded (\u001b]8;;file://dlmslabmr01/etc/systemd/system/swms.service\u0007/etc/systemd/system/swms.service\u001b]8;;\u0007; enabled; vendor preset: disabled)\r\n   Active: \u001b[0;1;32mactive (running)\u001b[0m since Wed 2026-04-01 17:55:23 IST; 3 weeks 6 days ago\r\n    Tasks: 136 (limit: 132892)\r\n   Memory: 4.0G\r\n   CGroup: /system.slice/swms.service\r\n           ├─  22940 /bin/bash /opt/swms/bin/run_mpcmp.sh 1 12 10.103.162.242 e…\r\n           ├─  23003 /bin/bash /opt/swms/bin/run_mpcmp.sh 2 12 10.103.162.242 e…\r\n           ├─  23047 /opt/swms/bin/MpcMp 1 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23067 /bin/bash /opt/swms/bin/run_mpcmp.sh 3 12 10.103.162.242 e…\r\n           ├─  23074 /opt/swms/bin/MpcMp 2 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23131 /bin/bash /opt/swms/bin/run_mpcmp.sh 4 12 10.103.162.242 e…\r\n           ├─  23137 /opt/swms/bin/MpcMp 3 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23195 /bin/bash /opt/swms/bin/run_mpcmp.sh 5 12 10.103.162.242 e…\r\n           ├─  23201 /opt/swms/bin/MpcMp 4 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23251 /bin/bash /opt/swms/bin/run_mpcmp.sh 6 12 10.103.162.242 e…\r\n           ├─  23279 /opt/swms/bin/MpcMp 5 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23321 /bin/bash /opt/swms/bin/run_mpcmp.sh 7 12 10.103.162.242 e…\r\n           ├─  23331 /opt/swms/bin/MpcMp 6 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23384 /bin/bash /opt/swms/bin/run_mpcmp.sh 8 12 10.103.162.242 e…\r\n           ├─  23397 /opt/swms/bin/MpcMp 7 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23447 /bin/bash /opt/swms/bin/run_mpcmp.sh 9 12 10.103.162.242 e…\r\n           ├─  23453 /opt/swms/bin/MpcMp 8 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23510 /bin/bash /opt/swms/bin/run_mpcmp.sh 10 12 10.103.162.242 …\r\n           ├─  23521 /opt/swms/bin/MpcMp 9 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23573 /bin/bash /opt/swms/bin/run_mpcmp.sh 11 12 10.103.162.242 …\r\n           ├─  23577 /opt/swms/bin/MpcMp 10 12 10.103.162.242 eth2 -1 0 3 2401:…\r\n           ├─  23636 /bin/bash /opt/swms/bin/run_mpcmp.sh 12 12 10.103.162.242 …\r\n           ├─  23638 /opt/swms/bin/MpcMp 11 12 10.103.162.242 eth2 -1 0 3 2401:…\r\n           ├─  23664 /opt/swms/bin/MpcMp 12 12 10.103.162.242 eth2 -1 0 3 2401:…\r\n           ├─  23926 /bin/bash /opt/swms/bin/run_confd.sh\r\n           ├─  23976 /opt/swms/confd/lib/confd/erts/bin/confd -K false -MHe tru…\r\n           ├─  23995 erl_child_setup 1024\r\n           ├─  24227 /opt/swms/bin/netmand -n 25 -p /var/run/netmand.pid\r\n           ├─  24495 /opt/swms/bin/rdagtd -n 89 -p /var/run/rdagtd.pid\r\n           ├─  24765 /bin/bash /opt/swms/bin/run_watchdogd.sh\r\n           ├─  24811 /opt/swms/bin/ms_watchdogd -n 90 -r 128 -s 4096 -t 600 -d\r\n           ├─  25061 /opt/swms/bin/syssrvr\r\n           ├─  25336 /bin/bash /opt/swms/bin/run_scc.sh\r\n           ├─  25396 /opt/swms/bin/scccp.out\r\n           ├─  29457 /bin/bash /opt/swms/bin/run_mpc.sh -2\r\n           ├─  29880 /opt/swms/bin/mpccp.out\r\n           ├─  31542 /bin/bash /opt/swms/bin/run_vxi.sh\r\n           ├─  31672 /opt/swms/bin/cmsvxi /var/opt/swms\r\n           ├─  32533 /bin/bash /opt/swms/bin/run_webrtc.sh\r\n           ├─  32608 /opt/swms/bin/webrtc 1\r\n           ├─  33433 /bin/bash /opt/swms/bin/run_mgr.sh 23 12\r\n           └─1697563 sleep 3\r\n\r\nApr 01 17:55:19 dlmslabmr01 swms[19229]: Total number of swms apps started = 23\r\nApr 01 17:55:19 dlmslabmr01 swms[19229]: Starting swms manager ...\r\nApr 01 17:55:20 dlmslabmr01 swms[19229]: Waiting for oamp manager to get ru… ...\r\nApr 01 17:55:20 dlmslabmr01 swms[19229]: swms started!\r\nApr 01 17:55:20 dlmslabmr01 swms[19229]: AutoRdGroupSetup OID 1.1.20.53.4 v…alse\r\nApr 01 17:55:23 dlmslabmr01 swms[33913]: chmod: missing operand after ‘a+t’\r\nApr 01 17:55:23 dlmslabmr01 swms[33913]: Try 'chmod --help' for more inform…ion.\r\nApr 01 17:55:23 dlmslabmr01 swms[33917]: changing security context of '/var….db'\r\nApr 01 17:55:23 dlmslabmr01 swms[19229]: /var/opt/swms/kwd/engine1 Files al…sent\r\nApr 01 17:55:23 dlmslabmr01 systemd[1]: Started Starting swms radisys service.\r\nHint: Some lines were ellipsized, use -l to show in full.\r\n__CMD_DONE__:0\r\n","r3":"-rw-r--r--. 1 om cloud-user 45867 Apr 28 15:36 DOC_VERIFICATION_PROMPT_5003_AMRWB_Mode6.3gp\n","r4":"\r\n[root@dlmslabmr01 ~]# cd /var/opt/swms/clips/persistent/provisioned/audioclips/RA\rAJ/PREPAID; echo __CMD_DONE__:$?\r\n__CMD_DONE__:0\r\n[root@dlmslabmr01 PREPAID]# ","r5":"\r\n[root@dlmslabmr01 PREPAID]# ls -lrt | grep \"DOC_VERIFICATION_PROMPT_5003_AMRWB_Mo\rode6.3gp\" | awk '{print $NF}' | paste -sd ' ' -\r\nDOC_VERIFICATION_PROMPT_5003_AMRWB_Mode6.3gp\r\n[root@dlmslabmr01 PREPAID]# \r\n[root@dlmslabmr01 PREPAID]# \r\n[root@dlmslabmr01 PREPAID]# ","r6":"ssh -F /dev/null -o MACs=hmac-sha2-256 -o HostKeyAlgo\rorithms=ecdsa-sha2-nistp256,ssh-rsa root@2401:4900:24:250b::3 \"mkdir -p /tmp/CR-1\r12345678/MRF4/$(echo '/var/opt/swms/clips/persistent/provisioned/audioclips/RAJ/P\rPREPAID' | sed 's#^/##; s#/#_#g')\"\r\nThis system belongs to Airtel. All content on this system is confidential in nature. The activities to this system may be monitored, recorded, or captured in order to comply with Airtel internal policies. Any unauthorised use of the system or the information therein shall be subjected to disciplinary action and may lead to criminal prosecution. By continuing to use this system you indicate your awareness of and consent to these terms and conditions of use.\r\n\rroot@2401:4900:24:250b::3's password: \r\nPermission denied, please try again.\r\r\n\rroot@2401:4900:24:250b::3's password: \r\n[root@dlmslabmr01 PREPAID]# ","r7":"scp -F /dev/null -o MACs=hmac-sha2-256 -o HostKeyAlgo\rorithms=ecdsa-sha2-nistp256,ssh-rsa DOC_VERIFICATION_PROMPT_5003_AMRWB_Mode6.3gp \r root@[2401:4900:24:250b::3]:/tmp/CR-12345678/MRF4/$(echo '/var/opt/swms/clips/pe\rersistent/provisioned/audioclips/RAJ/PREPAID' | sed 's#^/##; s#/#_#g')/.\r\nThis system belongs to Airtel. All content on this system is confidential in nature. The activities to this system may be monitored, recorded, or captured in order to comply with Airtel internal policies. Any unauthorised use of the system or the information therein shall be subjected to disciplinary action and may lead to criminal prosecution. By continuing to use this system you indicate your awareness of and consent to these terms and conditions of use.\r\n\rroot@2401:4900:24:250b::3's password: \r\n\rDOC_VERIFICATION_PROMPT_5003_AMRWB_Mode6.3gp    0%    0     0.0KB/s   --:-- ETA\rDOC_VERIFICATION_PROMPT_5003_AMRWB_Mode6.3gp  100%   45KB   5.6MB/s   00:00    \r\n[root@dlmslabmr01 PREPAID]# ","r8":"ssh -F /dev/null -o MACs=hmac-sha2-256 -o HostKeyAlgo\rorithms=ecdsa-sha2-nistp256,ssh-rsa root@2401:4900:24:250b::3 \"mkdir -p /tmp/CR-1\r12345678\"\r\nThis system belongs to Airtel. All content on this system is confidential in nature. The activities to this system may be monitored, recorded, or captured in order to comply with Airtel internal policies. Any unauthorised use of the system or the information therein shall be subjected to disciplinary action and may lead to criminal prosecution. By continuing to use this system you indicate your awareness of and consent to these terms and conditions of use.\r\n\rroot@2401:4900:24:250b::3's password: \r\nPermission denied, please try again.\r\r\n\rroot@2401:4900:24:250b::3's password: \r\n[root@dlmslabmr01 PREPAID]# ","r9":"DOC_VERIFICATION_PROMPT_5003_AMRWB_Mode6.3gp        45867 100%\n","r10":"scp -F /dev/null -o MACs=hmac-sha2-256 -o HostKeyAlgo\rorithms=ecdsa-sha2-nistp256,ssh-rsa root@[2401:4900:24:250b::3]:/tmp/CR-12345678/\r/DOC_VERIFICATION_PROMPT_5003_AMRWB_Mode6.3gp /tmp/.\r\nThis system belongs to Airtel. All content on this system is confidential in nature. The activities to this system may be monitored, recorded, or captured in order to comply with Airtel internal policies. Any unauthorised use of the system or the information therein shall be subjected to disciplinary action and may lead to criminal prosecution. By continuing to use this system you indicate your awareness of and consent to these terms and conditions of use.\r\n\rroot@2401:4900:24:250b::3's password: \r\n\rDOC_VERIFICATION_PROMPT_5003_AMRWB_Mode6.3gp    0%    0     0.0KB/s   --:-- ETA\rDOC_VERIFICATION_PROMPT_5003_AMRWB_Mode6.3gp  100%   45KB  37.2MB/s   00:00    \r\n[root@dlmslabmr01 PREPAID]# ","r11":"\\cp -p /tmp/DOC_VERIFICATION_PROMPT_5003_AMRWB_Mode6.\r.3gp /var/opt/swms/clips/persistent/provisioned/audioclips/RAJ/PREPAID; echo __CM\rMD_DONE__:$?\r\n__CMD_DONE__:0\r\n[root@dlmslabmr01 PREPAID]# ","r12":"\r\n[root@dlmslabmr01 PREPAID]# chmod1 -R 777 /var/opt/swms/clips/persistent/provisio\roned/audioclips/RAJ/PREPAID; echo __CMD_DONE__:$?\r\n-bash: chmod1: command not found\r\n__CMD_DONE__:127\r\n[root@dlmslabmr01 PREPAID]# ","r13":"\r\n[root@dlmslabmr01 PREPAID]# cd /var/opt/swms/clips/persistent/provisioned/audiocl\rlips/RAJ/PREPAID\r\n[root@dlmslabmr01 PREPAID]# \r\n[root@dlmslabmr01 PREPAID]# ","r14":"ls -lrt | grep DOC_VERIFICATION_PROMPT_5003_AMRWB_Mod\rde6.3gp | awk '{print $NF}' | paste -sd ' '\r\nDOC_VERIFICATION_PROMPT_5003_AMRWB_Mode6.3gp\r\n[root@dlmslabmr01 PREPAID]# \r\n[root@dlmslabmr01 PREPAID]# ","r15":"rm -f DOC_VERIFICATION_PROMPT_5003_AMRWB_Mode6.3gp\r\n[root@dlmslabmr01 PREPAID]# \r\n[root@dlmslabmr01 PREPAID]# ","r16":"ssh -F /dev/null -o MACs=hmac-sha2-256 -o HostKeyAlgo\rorithms=ecdsa-sha2-nistp256,ssh-rsa root@2401:4900:24:250b::3 \"ls -lrt /tmp/CR-12\r2345678/MRF4/$(echo '/var/opt/swms/clips/persistent/provisioned/audioclips/RAJ/PR\rREPAID' | sed 's#^/##; s#/#_#g')\"\r\nThis system belongs to Airtel. All content on this system is confidential in nature. The activities to this system may be monitored, recorded, or captured in order to comply with Airtel internal policies. Any unauthorised use of the system or the information therein shall be subjected to disciplinary action and may lead to criminal prosecution. By continuing to use this system you indicate your awareness of and consent to these terms and conditions of use.\r\n\rroot@2401:4900:24:250b::3's password: \r\nPermission denied, please try again.\r\r\n\rroot@2401:4900:24:250b::3's password: \r\ntotal 48\r\n-rw-r-----. 1 root root 45867 Apr 28 16:55 DOC_VERIFICATION_PROMPT_5003_AMRWB_Mode6.3gp\r\n[root@dlmslabmr01 PREPAID]# ","r17":"scp -F /dev/null -o MACs=hmac-sha2-256 -o HostKeyAlgo\rorithms=ecdsa-sha2-nistp256,ssh-rsa root@[2401:4900:24:250b::3]:/tmp/CR-12345678/\r/MRF4/$(echo '/var/opt/swms/clips/persistent/provisioned/audioclips/RAJ/PREPAID' \r | sed 's#^/##; s#/#_#g')/* .\r\nThis system belongs to Airtel. All content on this system is confidential in nature. The activities to this system may be monitored, recorded, or captured in order to comply with Airtel internal policies. Any unauthorised use of the system or the information therein shall be subjected to disciplinary action and may lead to criminal prosecution. By continuing to use this system you indicate your awareness of and consent to these terms and conditions of use.\r\n\rroot@2401:4900:24:250b::3's password: \r\n\rDOC_VERIFICATION_PROMPT_5003_AMRWB_Mode6.3gp    0%    0     0.0KB/s   --:-- ETA\rDOC_VERIFICATION_PROMPT_5003_AMRWB_Mode6.3gp  100%   45KB  30.4MB/s   00:00    \r\n[root@dlmslabmr01 PREPAID]# ","r18":"ls -ltrh /var/opt/swms/clips/persistent/provisioned/a\raudioclips/RAJ/PREPAID\r\ntotal 96K\r\n-rwxrwxrwx. 1 root root 45K Apr 25 16:06 \u001b[0m\u001b[01;32mDOC_VERIFICATION_PROMPT_5003_G711A.wav\u001b[0m\r\n-rw-r-----. 1 root root 45K Apr 28 22:26 DOC_VERIFICATION_PROMPT_5003_AMRWB_Mode6.3gp\r\n[root@dlmslabmr01 PREPAID]# \r\n[root@dlmslabmr01 PREPAID]# ","r19":"systemctl status swms --no-pager; echo __CMD_DONE__:$\r$?\r\n\u001b[0;1;32m●\u001b[0m swms.service - Starting swms radisys service\r\n   Loaded: loaded (\u001b]8;;file://dlmslabmr01/etc/systemd/system/swms.service\u0007/etc/systemd/system/swms.service\u001b]8;;\u0007; enabled; vendor preset: disabled)\r\n   Active: \u001b[0;1;32mactive (running)\u001b[0m since Wed 2026-04-01 17:55:23 IST; 3 weeks 6 days ago\r\n    Tasks: 136 (limit: 132892)\r\n   Memory: 4.0G\r\n   CGroup: /system.slice/swms.service\r\n           ├─  22940 /bin/bash /opt/swms/bin/run_mpcmp.sh 1 12 10.103.162.242 e…\r\n           ├─  23003 /bin/bash /opt/swms/bin/run_mpcmp.sh 2 12 10.103.162.242 e…\r\n           ├─  23047 /opt/swms/bin/MpcMp 1 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23067 /bin/bash /opt/swms/bin/run_mpcmp.sh 3 12 10.103.162.242 e…\r\n           ├─  23074 /opt/swms/bin/MpcMp 2 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23131 /bin/bash /opt/swms/bin/run_mpcmp.sh 4 12 10.103.162.242 e…\r\n           ├─  23137 /opt/swms/bin/MpcMp 3 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23195 /bin/bash /opt/swms/bin/run_mpcmp.sh 5 12 10.103.162.242 e…\r\n           ├─  23201 /opt/swms/bin/MpcMp 4 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23251 /bin/bash /opt/swms/bin/run_mpcmp.sh 6 12 10.103.162.242 e…\r\n           ├─  23279 /opt/swms/bin/MpcMp 5 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23321 /bin/bash /opt/swms/bin/run_mpcmp.sh 7 12 10.103.162.242 e…\r\n           ├─  23331 /opt/swms/bin/MpcMp 6 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23384 /bin/bash /opt/swms/bin/run_mpcmp.sh 8 12 10.103.162.242 e…\r\n           ├─  23397 /opt/swms/bin/MpcMp 7 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23447 /bin/bash /opt/swms/bin/run_mpcmp.sh 9 12 10.103.162.242 e…\r\n           ├─  23453 /opt/swms/bin/MpcMp 8 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23510 /bin/bash /opt/swms/bin/run_mpcmp.sh 10 12 10.103.162.242 …\r\n           ├─  23521 /opt/swms/bin/MpcMp 9 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23573 /bin/bash /opt/swms/bin/run_mpcmp.sh 11 12 10.103.162.242 …\r\n           ├─  23577 /opt/swms/bin/MpcMp 10 12 10.103.162.242 eth2 -1 0 3 2401:…\r\n           ├─  23636 /bin/bash /opt/swms/bin/run_mpcmp.sh 12 12 10.103.162.242 …\r\n           ├─  23638 /opt/swms/bin/MpcMp 11 12 10.103.162.242 eth2 -1 0 3 2401:…\r\n           ├─  23664 /opt/swms/bin/MpcMp 12 12 10.103.162.242 eth2 -1 0 3 2401:…\r\n           ├─  23926 /bin/bash /opt/swms/bin/run_confd.sh\r\n           ├─  23976 /opt/swms/confd/lib/confd/erts/bin/confd -K false -MHe tru…\r\n           ├─  23995 erl_child_setup 1024\r\n           ├─  24227 /opt/swms/bin/netmand -n 25 -p /var/run/netmand.pid\r\n           ├─  24495 /opt/swms/bin/rdagtd -n 89 -p /var/run/rdagtd.pid\r\n           ├─  24765 /bin/bash /opt/swms/bin/run_watchdogd.sh\r\n           ├─  24811 /opt/swms/bin/ms_watchdogd -n 90 -r 128 -s 4096 -t 600 -d\r\n           ├─  25061 /opt/swms/bin/syssrvr\r\n           ├─  25336 /bin/bash /opt/swms/bin/run_scc.sh\r\n           ├─  25396 /opt/swms/bin/scccp.out\r\n           ├─  29457 /bin/bash /opt/swms/bin/run_mpc.sh -2\r\n           ├─  29880 /opt/swms/bin/mpccp.out\r\n           ├─  31542 /bin/bash /opt/swms/bin/run_vxi.sh\r\n           ├─  31672 /opt/swms/bin/cmsvxi /var/opt/swms\r\n           ├─  32533 /bin/bash /opt/swms/bin/run_webrtc.sh\r\n           ├─  32608 /opt/swms/bin/webrtc 1\r\n           ├─  33433 /bin/bash /opt/swms/bin/run_mgr.sh 23 12\r\n           └─1698600 sleep 3\r\n\r\nApr 01 17:55:19 dlmslabmr01 swms[19229]: Total number of swms apps started = 23\r\nApr 01 17:55:19 dlmslabmr01 swms[19229]: Starting swms manager ...\r\nApr 01 17:55:20 dlmslabmr01 swms[19229]: Waiting for oamp manager to get ru… ...\r\nApr 01 17:55:20 dlmslabmr01 swms[19229]: swms started!\r\nApr 01 17:55:20 dlmslabmr01 swms[19229]: AutoRdGroupSetup OID 1.1.20.53.4 v…alse\r\nApr 01 17:55:23 dlmslabmr01 swms[33913]: chmod: missing operand after ‘a+t’\r\nApr 01 17:55:23 dlmslabmr01 swms[33913]: Try 'chmod --help' for more inform…ion.\r\nApr 01 17:55:23 dlmslabmr01 swms[33917]: changing security context of '/var….db'\r\nApr 01 17:55:23 dlmslabmr01 swms[19229]: /var/opt/swms/kwd/engine1 Files al…sent\r\nApr 01 17:55:23 dlmslabmr01 systemd[1]: Started Starting swms radisys service.\r\nHint: Some lines were ellipsized, use -l to show in full.\r\n__CMD_DONE__:0\r\n[root@dlmslabmr01 PREPAID]# "};
-  var VAL_CONCLUSIONS = {"r12":"chmod failed"};
+  var RAW_OUTPUTS     = {"r0":"Thu May  7 15:23:52 IST 2026","r1":"real\t0m0.000s\r\nuser\t0m0.000s\r\nsys\t0m0.000s","r2":"[0;1;32m●\u001b[0m swms.service - Starting swms radisys service\r\n   Loaded: loaded (\u001b]8;;file://dlmslabmr01/etc/systemd/system/swms.service\u0007/etc/systemd/system/swms.service\u001b]8;;\u0007; enabled; vendor preset: disabled)\r\n   Active: \u001b[0;1;32mactive (running)\u001b[0m since Wed 2026-04-01 17:55:23 IST; 1 months 5 days ago\r\n    Tasks: 136 (limit: 132892)\r\n   Memory: 4.0G\r\n   CGroup: /system.slice/swms.service\r\n           ├─  22940 /bin/bash /opt/swms/bin/run_mpcmp.sh 1 12 10.103.162.242 e…\r\n           ├─  23003 /bin/bash /opt/swms/bin/run_mpcmp.sh 2 12 10.103.162.242 e…\r\n           ├─  23047 /opt/swms/bin/MpcMp 1 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23067 /bin/bash /opt/swms/bin/run_mpcmp.sh 3 12 10.103.162.242 e…\r\n           ├─  23074 /opt/swms/bin/MpcMp 2 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23131 /bin/bash /opt/swms/bin/run_mpcmp.sh 4 12 10.103.162.242 e…\r\n           ├─  23137 /opt/swms/bin/MpcMp 3 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23195 /bin/bash /opt/swms/bin/run_mpcmp.sh 5 12 10.103.162.242 e…\r\n           ├─  23201 /opt/swms/bin/MpcMp 4 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23251 /bin/bash /opt/swms/bin/run_mpcmp.sh 6 12 10.103.162.242 e…\r\n           ├─  23279 /opt/swms/bin/MpcMp 5 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23321 /bin/bash /opt/swms/bin/run_mpcmp.sh 7 12 10.103.162.242 e…\r\n           ├─  23331 /opt/swms/bin/MpcMp 6 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23384 /bin/bash /opt/swms/bin/run_mpcmp.sh 8 12 10.103.162.242 e…\r\n           ├─  23397 /opt/swms/bin/MpcMp 7 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23447 /bin/bash /opt/swms/bin/run_mpcmp.sh 9 12 10.103.162.242 e…\r\n           ├─  23453 /opt/swms/bin/MpcMp 8 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23510 /bin/bash /opt/swms/bin/run_mpcmp.sh 10 12 10.103.162.242 …\r\n           ├─  23521 /opt/swms/bin/MpcMp 9 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23573 /bin/bash /opt/swms/bin/run_mpcmp.sh 11 12 10.103.162.242 …\r\n           ├─  23577 /opt/swms/bin/MpcMp 10 12 10.103.162.242 eth2 -1 0 3 2401:…\r\n           ├─  23636 /bin/bash /opt/swms/bin/run_mpcmp.sh 12 12 10.103.162.242 …\r\n           ├─  23638 /opt/swms/bin/MpcMp 11 12 10.103.162.242 eth2 -1 0 3 2401:…\r\n           ├─  23664 /opt/swms/bin/MpcMp 12 12 10.103.162.242 eth2 -1 0 3 2401:…\r\n           ├─  23926 /bin/bash /opt/swms/bin/run_confd.sh\r\n           ├─  23976 /opt/swms/confd/lib/confd/erts/bin/confd -K false -MHe tru…\r\n           ├─  23995 erl_child_setup 1024\r\n           ├─  24227 /opt/swms/bin/netmand -n 25 -p /var/run/netmand.pid\r\n           ├─  24495 /opt/swms/bin/rdagtd -n 89 -p /var/run/rdagtd.pid\r\n           ├─  24765 /bin/bash /opt/swms/bin/run_watchdogd.sh\r\n           ├─  24811 /opt/swms/bin/ms_watchdogd -n 90 -r 128 -s 4096 -t 600 -d\r\n           ├─  25061 /opt/swms/bin/syssrvr\r\n           ├─  25336 /bin/bash /opt/swms/bin/run_scc.sh\r\n           ├─  25396 /opt/swms/bin/scccp.out\r\n           ├─  29457 /bin/bash /opt/swms/bin/run_mpc.sh -2\r\n           ├─  29880 /opt/swms/bin/mpccp.out\r\n           ├─  31542 /bin/bash /opt/swms/bin/run_vxi.sh\r\n           ├─  31672 /opt/swms/bin/cmsvxi /var/opt/swms\r\n           ├─  32533 /bin/bash /opt/swms/bin/run_webrtc.sh\r\n           ├─  32608 /opt/swms/bin/webrtc 1\r\n           ├─  33433 /bin/bash /opt/swms/bin/run_mgr.sh 23 12\r\n           └─3077960 sleep 3\r\n\r\nApr 01 17:55:19 dlmslabmr01 swms[19229]: Total number of swms apps started = 23\r\nApr 01 17:55:19 dlmslabmr01 swms[19229]: Starting swms manager ...\r\nApr 01 17:55:20 dlmslabmr01 swms[19229]: Waiting for oamp manager to get ru… ...\r\nApr 01 17:55:20 dlmslabmr01 swms[19229]: swms started!\r\nApr 01 17:55:20 dlmslabmr01 swms[19229]: AutoRdGroupSetup OID 1.1.20.53.4 v…alse\r\nApr 01 17:55:23 dlmslabmr01 swms[33913]: chmod: missing operand after ‘a+t’\r\nApr 01 17:55:23 dlmslabmr01 swms[33913]: Try 'chmod --help' for more inform…ion.\r\nApr 01 17:55:23 dlmslabmr01 swms[33917]: changing security context of '/var….db'\r\nApr 01 17:55:23 dlmslabmr01 swms[19229]: /var/opt/swms/kwd/engine1 Files al…sent\r\nApr 01 17:55:23 dlmslabmr01 systemd[1]: Started Starting swms radisys service.\r\nHint: Some lines were ellipsized, use -l to show in full.","r3":"-rwxrwxrwx. 1 om cloud-user 22026 Apr 26 22:17 DOC_VERIFICATION_PROMPT_7999_AMRWB_Mode1.3gp\n","r4":"__CMD_DONE__:0\r\n[root@dlmslabmr01 PREPAID]#","r5":"DOC_VERIFICATION_PROMPT_7999_AMRWB_Mode1.3gp","r6":"This system belongs to Airtel. All content on this system is confidential in nature. The activities to this system may be monitored, recorded, or captured in order to comply with Airtel internal policies. Any unauthorised use of the system or the information therein shall be subjected to disciplinary action and may lead to criminal prosecution. By continuing to use this system you indicate your awareness of and consent to these terms and conditions of use.\n\nroot@2401:4900:24:250b::3's password: \nPermission denied, please try again.\n\n\nroot@2401:4900:24:250b::3's password:","r7":"This system belongs to Airtel. All content on this system is confidential in nature. The activities to this system may be monitored, recorded, or captured in order to comply with Airtel internal policies. Any unauthorised use of the system or the information therein shall be subjected to disciplinary action and may lead to criminal prosecution. By continuing to use this system you indicate your awareness of and consent to these terms and conditions of use.\n\nroot@2401:4900:24:250b::3's password: \n\nDOC_VERIFICATION_PROMPT_7999_AMRWB_Mode1.3gp    0%    0     0.0KB/s   --:-- ETA\nDOC_VERIFICATION_PROMPT_7999_AMRWB_Mode1.3gp  100%   22KB  17.2MB/s   00:00","r8":"This system belongs to Airtel. All content on this system is confidential in nature. The activities to this system may be monitored, recorded, or captured in order to comply with Airtel internal policies. Any unauthorised use of the system or the information therein shall be subjected to disciplinary action and may lead to criminal prosecution. By continuing to use this system you indicate your awareness of and consent to these terms and conditions of use.\n\nroot@2401:4900:24:250b::3's password: \nPermission denied, please try again.\n\n\nroot@2401:4900:24:250b::3's password:","r9":"DOC_VERIFICATION_PROMPT_7999_AMRWB_Mode1.3gp        22026 100%\n","r10":"This system belongs to Airtel. All content on this system is confidential in nature. The activities to this system may be monitored, recorded, or captured in order to comply with Airtel internal policies. Any unauthorised use of the system or the information therein shall be subjected to disciplinary action and may lead to criminal prosecution. By continuing to use this system you indicate your awareness of and consent to these terms and conditions of use.\n\nroot@2401:4900:24:250b::3's password: \n\nDOC_VERIFICATION_PROMPT_7999_AMRWB_Mode1.3gp    0%    0     0.0KB/s   --:-- ETA\nDOC_VERIFICATION_PROMPT_7999_AMRWB_Mode1.3gp  100%   22KB  21.9MB/s   00:00","r11":"__CMD_DONE__:0\r\n[root@dlmslabmr01 PREPAID]#","r12":"__CMD_DONE__:0\r\n[root@dlmslabmr01 PREPAID]#","r13":"-rwx-w--w- /var/opt/swms/clips/persistent/provisioned/audioclips/RAJ/PREPAID/DOC_VERIFICATION_PROMPT_5003_AMRWB_Mode6.3gp\n-rwx-w--w- /var/opt/swms/clips/persistent/provisioned/audioclips/RAJ/PREPAID/DOC_VERIFICATION_PROMPT_5003_G711A.wav\n-rwx-w--w- /var/opt/swms/clips/persistent/provisioned/audioclips/RAJ/PREPAID/DOC_VERIFICATION_PROMPT_7999_AMRWB_Mode1.3gp","r14":"","r15":"DOC_VERIFICATION_PROMPT_7999_AMRWB_Mode1.3gp","r16":"This system belongs to Airtel. All content on this system is confidential in nature. The activities to this system may be monitored, recorded, or captured in order to comply with Airtel internal policies. Any unauthorised use of the system or the information therein shall be subjected to disciplinary action and may lead to criminal prosecution. By continuing to use this system you indicate your awareness of and consent to these terms and conditions of use.\n\nroot@2401:4900:24:250b::3's password: \nPermission denied, please try again.\n\n\nroot@2401:4900:24:250b::3's password: \ntotal 72\n-rw-r-----. 1 root root 45867 May  4 18:24 DOC_VERIFICATION_PROMPT_5003_AMRWB_Mode6.3gp\n-rwx------. 1 root root 22026 May  7 15:24 DOC_VERIFICATION_PROMPT_7999_AMRWB_Mode1.3gp","r17":"[0;1;32m●\u001b[0m swms.service - Starting swms radisys service\r\n   Loaded: loaded (\u001b]8;;file://dlmslabmr01/etc/systemd/system/swms.service\u0007/etc/systemd/system/swms.service\u001b]8;;\u0007; enabled; vendor preset: disabled)\r\n   Active: \u001b[0;1;32mactive (running)\u001b[0m since Wed 2026-04-01 17:55:23 IST; 1 months 5 days ago\r\n    Tasks: 141 (limit: 132892)\r\n   Memory: 4.0G\r\n   CGroup: /system.slice/swms.service\r\n           ├─  22940 /bin/bash /opt/swms/bin/run_mpcmp.sh 1 12 10.103.162.242 e…\r\n           ├─  23003 /bin/bash /opt/swms/bin/run_mpcmp.sh 2 12 10.103.162.242 e…\r\n           ├─  23047 /opt/swms/bin/MpcMp 1 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23067 /bin/bash /opt/swms/bin/run_mpcmp.sh 3 12 10.103.162.242 e…\r\n           ├─  23074 /opt/swms/bin/MpcMp 2 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23131 /bin/bash /opt/swms/bin/run_mpcmp.sh 4 12 10.103.162.242 e…\r\n           ├─  23137 /opt/swms/bin/MpcMp 3 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23195 /bin/bash /opt/swms/bin/run_mpcmp.sh 5 12 10.103.162.242 e…\r\n           ├─  23201 /opt/swms/bin/MpcMp 4 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23251 /bin/bash /opt/swms/bin/run_mpcmp.sh 6 12 10.103.162.242 e…\r\n           ├─  23279 /opt/swms/bin/MpcMp 5 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23321 /bin/bash /opt/swms/bin/run_mpcmp.sh 7 12 10.103.162.242 e…\r\n           ├─  23331 /opt/swms/bin/MpcMp 6 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23384 /bin/bash /opt/swms/bin/run_mpcmp.sh 8 12 10.103.162.242 e…\r\n           ├─  23397 /opt/swms/bin/MpcMp 7 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23447 /bin/bash /opt/swms/bin/run_mpcmp.sh 9 12 10.103.162.242 e…\r\n           ├─  23453 /opt/swms/bin/MpcMp 8 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23510 /bin/bash /opt/swms/bin/run_mpcmp.sh 10 12 10.103.162.242 …\r\n           ├─  23521 /opt/swms/bin/MpcMp 9 12 10.103.162.242 eth2 -1 0 3 2401:4…\r\n           ├─  23573 /bin/bash /opt/swms/bin/run_mpcmp.sh 11 12 10.103.162.242 …\r\n           ├─  23577 /opt/swms/bin/MpcMp 10 12 10.103.162.242 eth2 -1 0 3 2401:…\r\n           ├─  23636 /bin/bash /opt/swms/bin/run_mpcmp.sh 12 12 10.103.162.242 …\r\n           ├─  23638 /opt/swms/bin/MpcMp 11 12 10.103.162.242 eth2 -1 0 3 2401:…\r\n           ├─  23664 /opt/swms/bin/MpcMp 12 12 10.103.162.242 eth2 -1 0 3 2401:…\r\n           ├─  23926 /bin/bash /opt/swms/bin/run_confd.sh\r\n           ├─  23976 /opt/swms/confd/lib/confd/erts/bin/confd -K false -MHe tru…\r\n           ├─  23995 erl_child_setup 1024\r\n           ├─  24227 /opt/swms/bin/netmand -n 25 -p /var/run/netmand.pid\r\n           ├─  24495 /opt/swms/bin/rdagtd -n 89 -p /var/run/rdagtd.pid\r\n           ├─  24765 /bin/bash /opt/swms/bin/run_watchdogd.sh\r\n           ├─  24811 /opt/swms/bin/ms_watchdogd -n 90 -r 128 -s 4096 -t 600 -d\r\n           ├─  25061 /opt/swms/bin/syssrvr\r\n           ├─  25336 /bin/bash /opt/swms/bin/run_scc.sh\r\n           ├─  25396 /opt/swms/bin/scccp.out\r\n           ├─  29457 /bin/bash /opt/swms/bin/run_mpc.sh -2\r\n           ├─  29880 /opt/swms/bin/mpccp.out\r\n           ├─  31542 /bin/bash /opt/swms/bin/run_vxi.sh\r\n           ├─  31672 /opt/swms/bin/cmsvxi /var/opt/swms\r\n           ├─  32533 /bin/bash /opt/swms/bin/run_webrtc.sh\r\n           ├─  32608 /opt/swms/bin/webrtc 1\r\n           ├─  33433 /bin/bash /opt/swms/bin/run_mgr.sh 23 12\r\n           ├─3078914 sleep 3\r\n           ├─3078924 sh -c ps -Laewo pid,tid,comm | grep -v SCRMTimer | grep SC…\r\n           ├─3078927 ps -Laewo pid,tid,comm\r\n           ├─3078928 grep -v SCRMTimer\r\n           ├─3078929 grep SCRM\r\n           └─3078930 awk -F  {print $2}\r\n\r\nApr 01 17:55:19 dlmslabmr01 swms[19229]: Total number of swms apps started = 23\r\nApr 01 17:55:19 dlmslabmr01 swms[19229]: Starting swms manager ...\r\nApr 01 17:55:20 dlmslabmr01 swms[19229]: Waiting for oamp manager to get ru… ...\r\nApr 01 17:55:20 dlmslabmr01 swms[19229]: swms started!\r\nApr 01 17:55:20 dlmslabmr01 swms[19229]: AutoRdGroupSetup OID 1.1.20.53.4 v…alse\r\nApr 01 17:55:23 dlmslabmr01 swms[33913]: chmod: missing operand after ‘a+t’\r\nApr 01 17:55:23 dlmslabmr01 swms[33913]: Try 'chmod --help' for more inform…ion.\r\nApr 01 17:55:23 dlmslabmr01 swms[33917]: changing security context of '/var….db'\r\nApr 01 17:55:23 dlmslabmr01 swms[19229]: /var/opt/swms/kwd/engine1 Files al…sent\r\nApr 01 17:55:23 dlmslabmr01 systemd[1]: Started Starting swms radisys service.\r\nHint: Some lines were ellipsized, use -l to show in full."};
+  var VAL_CONCLUSIONS = {"r13":"New announcement files in destination folder does not have full permission","r15":"Announcement files are not present on Destination path of MRF4"};
 
   function toggleNode(id) {
     var body = document.getElementById('node-body-'   + id);
@@ -491,7 +540,8 @@
   function exportToXLSX() {
     var wb = XLSX.utils.book_new();
     var headers = ['Node','Phase','Command','Description','Target Node','Execution Status',
-                   'Reason of Failure','Validation Set','Validation Criteria','Validation Status','Validation Conclusion'];
+                   'Reason of Failure','Validation Set','Validation Criteria','Validation Status','Validation Conclusion',
+                   'Start Time','End Time','Duration'];
     var allData = [headers];
     document.querySelectorAll('.node-panel').forEach(function(panel) {
       var nodeName = panel.querySelector('.node-name') ? panel.querySelector('.node-name').textContent.trim() : '';
@@ -509,12 +559,15 @@
           cells[5].textContent.trim(),
           cells[6].textContent.trim(),
           cells[7].textContent.trim(),
-          VAL_CONCLUSIONS[key] || cells[8].textContent.trim()
+          VAL_CONCLUSIONS[key] || cells[8].textContent.trim(),
+          cells[9].textContent.trim(),
+          cells[10].textContent.trim(),
+          cells[11].textContent.trim()
         ]);
       });
     });
     var ws = XLSX.utils.aoa_to_sheet(allData);
-    ws['!cols'] = [{width:20},{width:22},{width:20},{width:28},{width:18},{width:14},{width:25},{width:10},{width:28},{width:14},{width:32}];
+    ws['!cols'] = [{width:20},{width:22},{width:20},{width:28},{width:18},{width:14},{width:25},{width:10},{width:28},{width:14},{width:32},{width:18},{width:18},{width:10}];
     XLSX.utils.book_append_sheet(wb, ws, 'Detail Report');
     XLSX.writeFile(wb, 'MOP_Detail_Report_' + new Date().toISOString().slice(0,10) + '.xlsx');
   }

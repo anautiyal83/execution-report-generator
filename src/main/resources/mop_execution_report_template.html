@@ -39,7 +39,7 @@
     .section-block-header { background: #1a3a5c; color: #fff; padding: 8px 14px; font-size: 12px; font-weight: 600; }
     .section-block-body { padding: 16px 18px; }
 
-    .badge { display: inline-block; padding: 1px 7px; border-radius: 10px; font-size: 10px; font-weight: 600; }
+    .badge { display: inline-block; padding: 1px 5px; border-radius: 10px; font-size: 9px; font-weight: 600; white-space: nowrap; }
     .badge-success  { background: #d4edda; color: #155724; }
     .badge-error    { background: #f8d7da; color: #721c24; }
     .badge-warning  { background: #fff3cd; color: #856404; }
@@ -115,6 +115,16 @@
 
     .node-summary-cards { margin-bottom: 14px; }
     .card-row + .card-row { margin-top: 10px; }
+
+    /* ── Activity timing bar ─────────────────────────────────────────────── */
+    .node-timing-bar {
+      display: flex; flex-wrap: wrap; gap: 6px 20px;
+      background: #e8f0fe; border-radius: 6px; padding: 7px 12px;
+      margin-bottom: 10px; font-size: 11px;
+    }
+    .timing-item { display: flex; gap: 4px; align-items: center; }
+    .timing-label { color: #1a3a5c; font-weight: 600; }
+    .timing-duration { font-weight: 600; color: #1e7e45; }
 
     /* ── Per-node toolbar ────────────────────────────────────────────────── */
     .node-toolbar { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; align-items: center; }
@@ -200,6 +210,7 @@
           <thead><tr>
             <th>Node Name</th><th>Status</th><th>Total</th><th>Success</th><th>Failed</th>
             <th>Val.Enabled</th><th>Val.Pass</th><th>Val.Fail</th><th>Warnings</th><th>Info Only</th>
+            <th>Start Time</th><th>End Time</th><th>Duration</th>
           </tr></thead>
           <tbody>{{NODES_SUMMARY_ROWS}}</tbody>
         </table>
@@ -413,7 +424,8 @@
   function exportToXLSX() {
     var wb = XLSX.utils.book_new();
     var headers = ['Node','Phase','Command','Description','Target Node','Execution Status',
-                   'Reason of Failure','Validation Set','Validation Criteria','Validation Status','Validation Conclusion'];
+                   'Reason of Failure','Validation Set','Validation Criteria','Validation Status','Validation Conclusion',
+                   'Start Time','End Time','Duration'];
     var allData = [headers];
     document.querySelectorAll('.node-panel').forEach(function(panel) {
       var nodeName = panel.querySelector('.node-name') ? panel.querySelector('.node-name').textContent.trim() : '';
@@ -432,12 +444,15 @@
           cells[5].textContent.trim(),
           cells[6].textContent.trim(),
           cells[7].textContent.trim(),
-          VAL_CONCLUSIONS[key] || cells[8].textContent.trim()
+          VAL_CONCLUSIONS[key] || cells[8].textContent.trim(),
+          cells[9].textContent.trim(),
+          cells[10].textContent.trim(),
+          cells[11].textContent.trim()
         ]);
       });
     });
     var ws = XLSX.utils.aoa_to_sheet(allData);
-    ws['!cols'] = [{width:20},{width:22},{width:20},{width:28},{width:18},{width:14},{width:25},{width:10},{width:28},{width:14},{width:32}];
+    ws['!cols'] = [{width:20},{width:22},{width:20},{width:28},{width:18},{width:14},{width:25},{width:10},{width:28},{width:14},{width:32},{width:18},{width:18},{width:10}];
     XLSX.utils.book_append_sheet(wb, ws, 'Detail Report');
     XLSX.writeFile(wb, 'MOP_Detail_Report_' + new Date().toISOString().slice(0,10) + '.xlsx');
   }
@@ -463,12 +478,15 @@
   <td class="cell-failed">{{SR_VAL_FAIL}}</td>
   <td class="cell-warning">{{SR_VAL_WARN}}</td>
   <td>{{SR_INFO_ONLY}}</td>
+  <td>{{SR_START_TIME}}</td>
+  <td>{{SR_END_TIME}}</td>
+  <td>{{SR_DURATION}}</td>
 </tr>
 </script>
 
 <script type="text/x-html-template" id="tpl-phase-header">
 <tr class="phase-header-row" onclick="togglePhase(this)">
-  <td colspan="10"><span class="phase-toggle-icon">&#9660;</span> {{PH_PHASE}}</td>
+  <td colspan="13"><span class="phase-toggle-icon">&#9660;</span> {{PH_PHASE}} <span class="badge {{PH_BADGE_CLS}}">{{PH_STATUS}}</span></td>
 </tr>
 </script>
 
@@ -483,6 +501,9 @@
   <td>{{CR_VAL_CRITERIA}}</td>
   <td><span class="badge {{CR_VAL_BADGE}}">{{CR_VAL_STATUS}}</span></td>
   <td>{{CR_VAL_DETAIL}}</td>
+  <td>{{CR_START_TIME}}</td>
+  <td>{{CR_END_TIME}}</td>
+  <td>{{CR_DURATION}}</td>
   <td><button class="output-toggle" onclick="loadOutput(this,'{{CR_KEY}}')">View Output</button><div class="output-content"></div></td>
 </tr>
 </script>
@@ -523,6 +544,11 @@
         <div class="card card--info"><div class="card-title">Info Only</div><div class="card-subtitle">&#9432; No Validation</div><div class="card-counter">{{NP_INFO_ONLY}}</div></div>
       </div>
     </div>
+    <div class="node-timing-bar">
+      <span class="timing-item"><span class="timing-label">Activity Start:</span> {{NP_START_TIME}}</span>
+      <span class="timing-item"><span class="timing-label">Activity End:</span> {{NP_END_TIME}}</span>
+      <span class="timing-item timing-duration"><span class="timing-label">Total Duration:</span> {{NP_DURATION}}</span>
+    </div>
     <div class="node-toolbar">
       <input type="text" class="search-input" id="search-{{NP_ID}}" placeholder="Search commands..." oninput="filterNodeTable('{{NP_ID}}')">
       <button class="btn-sm" id="failed-toggle-{{NP_ID}}" onclick="toggleFailedOnly('{{NP_ID}}')">Failed Only</button>
@@ -532,7 +558,8 @@
         <thead><tr>
           <th class="col-command">Command</th><th>Description</th><th>Target Node</th>
           <th>Exec Status</th><th>Fail Reason</th><th>Validate</th>
-          <th>Val Criteria</th><th>Val Status</th><th>Val Conclusion</th><th>Output</th>
+          <th>Val Criteria</th><th>Val Status</th><th>Val Conclusion</th>
+          <th>Start Time</th><th>End Time</th><th>Duration</th><th>Output</th>
         </tr></thead>
         <tbody>{{NP_COMMAND_ROWS}}</tbody>
       </table>
